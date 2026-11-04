@@ -1,0 +1,31 @@
+node_modules/
+.pnpm-store/
+.next/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.tsbuildinfo
+
+# Local uploads and clinical attachments
+uploads/
+**/uploads/
+
+# Private keys and certificates
+*.pem
+*.key
+*.cert
+*.crt
+
+# Database dumps and backups
+*.dump
+*.bak
+*.sql.gz

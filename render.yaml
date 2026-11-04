@@ -1,0 +1,41 @@
+# ==============================================================================
+# MedCore HMS — Render Blueprint Configuration (Zero-Cost ₹0 Architecture)
+# Defines the free backend web service on Render without auto-migrations or paid add-ons.
+# ==============================================================================
+
+services:
+  - type: web
+    name: medcore-api
+    runtime: node
+    plan: free
+    region: oregon
+    # Monorepo build: installs dependencies, generates Prisma client using pinned workspace version, and compiles NestJS.
+    # CRITICAL: Database migrations are intentionally DECOUPLED from the build step
+    # to protect against unintended schema mutations or build lock failures.
+    buildCommand: corepack enable && corepack prepare pnpm@9.15.9 --activate && pnpm install --frozen-lockfile && pnpm --filter @medcore/backend run prisma:generate && pnpm --filter @medcore/backend build
+    # Starts the compiled NestJS production server from the monorepo root
+    startCommand: node backend/dist/src/main.js
+    # Active health check endpoint returning HTTP 200 (fails with 503 if DB is unreachable)
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Neon PostgreSQL Connection String (configured via Render dashboard)
+      - key: DATABASE_URL
+        sync: false
+      # Authoritative Vercel Frontend Origin for CORS (e.g., https://medcore-hms.vercel.app)
+      - key: FRONTEND_URL
+        sync: false
+      # Cryptographically Secure JWT Signing Secrets
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN_DAYS
+        value: 7

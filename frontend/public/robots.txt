@@ -1,0 +1,11 @@
+# MedCore HMS Production Robots Exclusion
+User-agent: *
+Disallow: /api/
+Disallow: /emr/
+Disallow: /portal/
+Disallow: /billing/
+Disallow: /prescriptions/
+Disallow: /laboratory/
+Disallow: /pharmacy/
+Disallow: /notifications/
+Allow: /

@@ -1,0 +1,21 @@
+{
+  "name": "medcore-hms",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @medcore/frontend --filter @medcore/backend dev",
+    "dev:frontend": "pnpm --filter @medcore/frontend dev",
+    "dev:backend": "pnpm --filter @medcore/backend start:dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "infra:up": "docker compose up -d postgres redis",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}

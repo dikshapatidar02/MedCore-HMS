@@ -1,0 +1,13 @@
+/var/log/medcore/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 medcore medcore
+    sharedscripts
+    postrotate
+        systemctl reload medcore-api > /dev/null 2>&1 || true
+    endscript
+}
