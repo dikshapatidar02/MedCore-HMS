@@ -151,8 +151,8 @@ export default function PrescriptionsPage() {
         apiRequest<any[]>("/pharmacy/medicines"),
         apiRequest<{ data?: any[] } | any[]>("/medical-records?limit=100"),
       ]);
-      const ptsList = Array.isArray(pts) ? pts : pts.data || [];
-      const recsList = Array.isArray(recs) ? recs : recs.data || [];
+      const ptsList = Array.isArray(pts) ? pts : (pts as any).items || (pts as any).data || [];
+      const recsList = Array.isArray(recs) ? recs : (recs as any).items || (recs as any).data || [];
       setPatients(ptsList);
       setMedicines(meds || []);
       setRecords(recsList);

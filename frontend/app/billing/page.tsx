@@ -181,8 +181,8 @@ export default function BillingPage() {
 
   const openConsolidateModal = async () => {
     try {
-      const appts = await apiRequest("/appointments");
-      setAppointments(Array.isArray(appts) ? appts : []);
+      const appts = await apiRequest<any>("/appointments");
+      setAppointments(Array.isArray(appts) ? appts : appts?.items || []);
       setShowConsolidateModal(true);
     } catch (err: any) {
       alert("Failed to load appointments for encounter consolidation.");

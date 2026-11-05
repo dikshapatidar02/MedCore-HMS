@@ -37,8 +37,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const data = await apiRequest<{ user: UserSession }>("/auth/me");
-      setUser(data.user);
+      const res = await apiRequest<any>("/auth/me");
+      const userData = res?.data || res?.user || res;
+      if (userData && userData.id && userData.role) {
+        setUser(userData);
+      } else {
+        setStoredToken(null);
+        setUser(null);
+      }
     } catch {
       setStoredToken(null);
       setUser(null);
@@ -52,17 +58,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchProfile]);
 
   const login = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const res = await apiRequest<{ accessToken: string; user: UserSession }>("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-      setStoredToken(res.accessToken);
-      setUser(res.user);
-    } finally {
-      setLoading(false);
+    const res = await apiRequest<any>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    const token = res?.data?.accessToken || res?.accessToken;
+    const userSession = res?.data?.user || res?.user;
+    if (!token || !userSession) {
+      throw new Error("Authentication response was missing user or token credentials.");
     }
+    setStoredToken(token);
+    setUser(userSession);
   };
 
   const logout = async () => {

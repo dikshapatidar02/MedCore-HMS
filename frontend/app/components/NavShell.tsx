@@ -33,6 +33,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -79,10 +80,13 @@ export function NavShell({ children }: { children: React.ReactNode }) {
   const handleManualLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
+    setIsSubmitting(true);
     try {
       await login(loginEmail, loginPassword);
     } catch (err: any) {
       setLoginError(err.message || "Failed to sign in. Please check credentials.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -279,9 +283,17 @@ export function NavShell({ children }: { children: React.ReactNode }) {
             <button
               type="submit"
               className="btn btn-primary"
+              disabled={isSubmitting}
               style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
             >
-              Sign In
+              {isSubmitting ? (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <Activity className="animate-spin" size={16} />
+                  <span>Signing In...</span>
+                </span>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
@@ -308,7 +320,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
                     style={{ fontSize: 11, padding: "4px 8px" }}
                     onClick={() => {
                       setLoginEmail(acc.email);
-                      setLoginPassword("");
+                      setLoginPassword("DemoPassword@123");
                     }}
                     title={`Fill ${acc.email}`}
                   >
@@ -340,7 +352,6 @@ export function NavShell({ children }: { children: React.ReactNode }) {
           <div className="sidebar-brand">
             <Activity style={{ color: "#38bdf8" }} />
             <span>MedCore HMS</span>
-            <span className="brand-badge">PHASE 13</span>
           </div>
           <button
             className="mobile-close-btn"
@@ -356,7 +367,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
             const Icon = item.icon;
             const active = pathname === item.href;
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className={`nav-link ${active ? "active" : ""}`}
@@ -364,7 +375,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
               >
                 <Icon size={18} />
                 <span>{item.label}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -391,19 +402,6 @@ export function NavShell({ children }: { children: React.ReactNode }) {
             >
               <Menu size={20} />
             </button>
-
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#0369a1",
-                background: "#e0f2fe",
-                padding: "4px 10px",
-                borderRadius: 6,
-              }}
-            >
-              TENANT: {user.hospitalId || "SUPER_ADMIN_SCOPE"}
-            </span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

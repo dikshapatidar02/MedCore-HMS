@@ -186,8 +186,9 @@ export default function LaboratoryPage() {
 
   const openCreateModal = async () => {
     try {
-      const pats = await apiRequest("/patients");
-      setPatients(Array.isArray(pats) ? pats : []);
+      const pats = await apiRequest<any>("/patients");
+      const list = Array.isArray(pats) ? pats : pats?.items || [];
+      setPatients(list);
       setShowCreateModal(true);
     } catch (err: any) {
       alert("Failed to load patients for order creation.");
@@ -202,10 +203,11 @@ export default function LaboratoryPage() {
       return;
     }
     try {
-      const recs = await apiRequest(`/emr/records?patientId=${patientId}`);
-      setRecords(Array.isArray(recs) ? recs : []);
-      if (recs && recs.length > 0) {
-        setSelectedRecordId(recs[0].id);
+      const recs = await apiRequest<any>(`/emr/records?patientId=${patientId}`);
+      const list = Array.isArray(recs) ? recs : recs?.items || [];
+      setRecords(list);
+      if (list && list.length > 0) {
+        setSelectedRecordId(list[0].id);
       }
     } catch (err) {
       console.error("Failed to load records for patient", err);
@@ -275,15 +277,18 @@ export default function LaboratoryPage() {
   const openResultModal = (order: LabOrder) => {
     setActiveOrder(order);
     const initialInputs: Record<string, any> = {};
-    order.items.forEach((item) => {
-      const existing = order.results?.find((r) => r.labTestId === item.labTestId);
-      initialInputs[item.labTestId] = {
+    const testList = order.items || (order.results as any) || [];
+    testList.forEach((item: any) => {
+      const testId = item.labTestId || item.id;
+      const existing = order.results?.find((r) => r.labTestId === testId);
+      const testObj = item.labTest || item;
+      initialInputs[testId] = {
         numericValue: existing?.numericValue || undefined,
-        textValue: existing?.textValue || "",
-        unit: existing?.unit || item.labTest.unit || "",
-        referenceRange: existing?.referenceRange || item.labTest.referenceRange || "",
-        flag: existing?.flag || "NORMAL",
-        notes: existing?.notes || "",
+        textValue: existing?.textValue || (existing as any)?.resultValue || "",
+        unit: existing?.unit || testObj?.units || testObj?.unit || "",
+        referenceRange: existing?.referenceRange || testObj?.referenceRange || "",
+        flag: existing?.flag || (existing as any)?.status || "NORMAL",
+        notes: existing?.notes || (existing as any)?.findings || "",
       };
     });
     setResultInputs(initialInputs);
@@ -295,16 +300,22 @@ export default function LaboratoryPage() {
     if (!activeOrder) return;
     try {
       setSubmitting(true);
-      const resultsPayload = activeOrder.items.map((item) => {
-        const input = resultInputs[item.labTestId] || {};
+      const testList = activeOrder.items || (activeOrder.results as any) || [];
+      const resultsPayload = testList.map((item: any) => {
+        const testId = item.labTestId || item.id;
+        const input = resultInputs[testId] || {};
+        const testObj = item.labTest || item;
         return {
-          testId: item.labTestId,
+          testId,
+          labTestId: testId,
+          resultValue: String(input.numericValue ?? input.textValue ?? "Normal"),
           numericValue: input.numericValue ? Number(input.numericValue) : undefined,
           textValue: input.textValue || undefined,
-          unit: input.unit || item.labTest.unit,
-          referenceRange: input.referenceRange || item.labTest.referenceRange,
+          unit: input.unit || testObj?.units || testObj?.unit,
+          referenceRange: input.referenceRange || testObj?.referenceRange,
           flag: input.flag || "NORMAL",
           notes: input.notes,
+          findings: input.notes,
         };
       });
 
@@ -729,25 +740,30 @@ export default function LaboratoryPage() {
                       Ordered Diagnostic Tests
                     </div>
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      {ord.items.map((it) => (
-                        <span
-                          key={it.id}
-                          style={{
-                            padding: "6px 12px",
-                            borderRadius: 8,
-                            background: "#fff",
-                            border: "1px solid var(--border)",
-                            fontSize: 13,
-                            fontWeight: 500,
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 6,
-                          }}
-                        >
-                          <FlaskConical size={14} style={{ color: "var(--primary)" }} />
-                          {it.labTest.testName} ({it.labTest.testCode})
-                        </span>
-                      ))}
+                      {(ord.items || (ord.results as any) || []).map((it: any) => {
+                        const testObj = it.labTest || it;
+                        const testName = testObj?.name || testObj?.testName || "Diagnostic Test";
+                        const testCode = testObj?.code || testObj?.testCode || "";
+                        return (
+                          <span
+                            key={it.id}
+                            style={{
+                              padding: "6px 12px",
+                              borderRadius: 8,
+                              background: "#fff",
+                              border: "1px solid var(--border)",
+                              fontSize: 13,
+                              fontWeight: 500,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                            }}
+                          >
+                            <FlaskConical size={14} style={{ color: "var(--primary)" }} />
+                            {testName} {testCode ? `(${testCode})` : ""}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -1067,8 +1083,13 @@ export default function LaboratoryPage() {
 
             <form onSubmit={handleSubmitResults}>
               <div style={{ display: "grid", gap: 16, marginBottom: 24 }}>
-                {activeOrder.items.map((item) => {
-                  const input = resultInputs[item.labTestId] || {};
+                {(activeOrder.items || (activeOrder.results as any) || []).map((item: any) => {
+                  const testId = item.labTestId || item.id;
+                  const input = resultInputs[testId] || {};
+                  const testObj = item.labTest || item;
+                  const testName = testObj?.name || testObj?.testName || "Diagnostic Test";
+                  const testCode = testObj?.code || testObj?.testCode || "";
+                  const refRange = testObj?.referenceRange || "N/A";
                   return (
                     <div
                       key={item.id}
@@ -1081,10 +1102,10 @@ export default function LaboratoryPage() {
                     >
                       <div style={{ fontWeight: 700, marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
                         <span>
-                          {item.labTest.testName} (<code>{item.labTest.testCode}</code>)
+                          {testName} {testCode ? <code>({testCode})</code> : null}
                         </span>
                         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                          Ref Range: {item.labTest.referenceRange || "N/A"}
+                          Ref Range: {refRange}
                         </span>
                       </div>
 

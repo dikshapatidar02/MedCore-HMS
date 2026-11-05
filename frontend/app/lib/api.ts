@@ -54,11 +54,22 @@ export async function apiRequest<T = any>(
   }
 
   if (!response.ok) {
-    const errorMsg =
-      (data && typeof data === "object" && (data.message || data.error)) ||
-      `Request failed with status ${response.status}`;
-    const displayMsg = Array.isArray(errorMsg) ? errorMsg.join(", ") : errorMsg;
-    throw new ApiError(response.status, displayMsg, data);
+    let errorMsg: string | null = null;
+    if (data && typeof data === "object") {
+      if (typeof data.message === "string") {
+        errorMsg = data.message;
+      } else if (Array.isArray(data.message)) {
+        errorMsg = data.message.join(", ");
+      } else if (data.error && typeof data.error === "object" && typeof data.error.message === "string") {
+        errorMsg = data.error.message;
+      } else if (typeof data.error === "string") {
+        errorMsg = data.error;
+      }
+    }
+    if (!errorMsg) {
+      errorMsg = `Request failed with status ${response.status}`;
+    }
+    throw new ApiError(response.status, errorMsg, data);
   }
 
   return data as T;
