@@ -146,26 +146,54 @@ function SuperAdminDashboardView({ data }: { data: SuperAdminDashboardDto }) {
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Total Hospitals</div>
+          <div className="metric-top">
+            <span className="metric-title">Total Hospitals</span>
+            <div className="metric-icon-well">
+              <Building2 size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.totalHospitals}</div>
-          <div className="metric-desc">Registered healthcare organizations</div>
+          <div className="metric-footer">
+            <span>Registered healthcare organizations</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Active Tenants</div>
+          <div className="metric-top">
+            <span className="metric-title">Active Tenants</span>
+            <div className="metric-icon-well success">
+              <Building2 size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--success)" }}>
             {data.activeHospitals}
           </div>
-          <div className="metric-desc">{data.onboardingHospitals} in onboarding, {data.suspendedHospitals} suspended</div>
+          <div className="metric-footer">
+            <span>{data.onboardingHospitals} onboarding &bull; {data.suspendedHospitals} suspended</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Platform Users</div>
+          <div className="metric-top">
+            <span className="metric-title">Platform Users</span>
+            <div className="metric-icon-well purple">
+              <Users size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.totalUsers}</div>
-          <div className="metric-desc">Across all 9 clinical & admin roles</div>
+          <div className="metric-footer">
+            <span>Across all 9 clinical & admin roles</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Consulting Doctors</div>
+          <div className="metric-top">
+            <span className="metric-title">Consulting Doctors</span>
+            <div className="metric-icon-well warning">
+              <Stethoscope size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.totalDoctors}</div>
-          <div className="metric-desc">{data.totalPatients} registered patients</div>
+          <div className="metric-footer">
+            <span>{data.totalPatients} registered patients</span>
+          </div>
         </div>
       </div>
 
@@ -173,8 +201,11 @@ function SuperAdminDashboardView({ data }: { data: SuperAdminDashboardDto }) {
         {/* Platform Appointments Distribution */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Platform Appointment Trends</h3>
-            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+            <h3 className="panel-title">
+              <Calendar size={18} style={{ color: "var(--primary)" }} />
+              <span>Platform Appointment Trends</span>
+            </h3>
+            <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
               Total: {data.totalAppointments}
             </span>
           </div>
@@ -214,7 +245,10 @@ function SuperAdminDashboardView({ data }: { data: SuperAdminDashboardDto }) {
         {/* Registered Hospitals List */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Hospital Tenants</h3>
+            <h3 className="panel-title">
+              <Building2 size={18} style={{ color: "var(--primary)" }} />
+              <span>Recent Hospital Tenants</span>
+            </h3>
             <Link href="/hospitals" className="btn btn-sm btn-outline">
               View All
             </Link>
@@ -287,28 +321,56 @@ function HospitalAdminDashboardView({ data }: { data: HospitalAdminDashboardDto 
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Registered Patients</div>
+          <div className="metric-top">
+            <span className="metric-title">Registered Patients</span>
+            <div className="metric-icon-well">
+              <Users size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.totalPatients}</div>
-          <div className="metric-desc">Hospital MRN records</div>
+          <div className="metric-footer">
+            <span>Hospital MRN records</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Medical Staff</div>
+          <div className="metric-top">
+            <span className="metric-title">Medical Staff</span>
+            <div className="metric-icon-well success">
+              <Stethoscope size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.totalDoctors}</div>
-          <div className="metric-desc">Across {data.totalDepartments} departments</div>
+          <div className="metric-footer">
+            <span>Across {data.totalDepartments} departments</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Today's Appointments</div>
+          <div className="metric-top">
+            <span className="metric-title">Today's Appointments</span>
+            <div className="metric-icon-well purple">
+              <Calendar size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--primary)" }}>
             {data.appointmentsSummary.today}
           </div>
-          <div className="metric-desc">{data.appointmentsSummary.pending} pending confirmation</div>
+          <div className="metric-footer">
+            <span>{data.appointmentsSummary.pending} pending confirmation</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Outstanding Balance</div>
+          <div className="metric-top">
+            <span className="metric-title">Outstanding Balance</span>
+            <div className="metric-icon-well warning">
+              <CreditCard size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: data.billingSummary.outstandingBalance > 0 ? "var(--warning)" : "var(--success)" }}>
             ₹{data.billingSummary.outstandingBalance.toLocaleString("en-IN")}
           </div>
-          <div className="metric-desc">Billed: ₹{data.billingSummary.totalBilled.toLocaleString("en-IN")}</div>
+          <div className="metric-footer">
+            <span>Billed: ₹{data.billingSummary.totalBilled.toLocaleString("en-IN")}</span>
+          </div>
         </div>
       </div>
 
@@ -457,38 +519,69 @@ function DoctorDashboardView({ data }: { data: DoctorDashboardDto }) {
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Today's Appointments</div>
+          <div className="metric-top">
+            <span className="metric-title">Today's Appointments</span>
+            <div className="metric-icon-well">
+              <Calendar size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--primary)" }}>
             {data.todayAppointmentsCount}
           </div>
-          <div className="metric-desc">Scheduled consultations for today</div>
+          <div className="metric-footer">
+            <span>Scheduled consultations for today</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Upcoming Appointments</div>
+          <div className="metric-top">
+            <span className="metric-title">Upcoming Bookings</span>
+            <div className="metric-icon-well purple">
+              <Clock size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.upcomingAppointmentsCount}</div>
-          <div className="metric-desc">Future confirmed bookings</div>
+          <div className="metric-footer">
+            <span>Future confirmed encounters</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Completed Consultations</div>
+          <div className="metric-top">
+            <span className="metric-title">Completed Consultations</span>
+            <div className="metric-icon-well success">
+              <CheckCircle2 size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--success)" }}>
             {data.totalCompletedConsultations}
           </div>
-          <div className="metric-desc">Total patient encounters closed</div>
+          <div className="metric-footer">
+            <span>Patient encounters successfully closed</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Pending Records (Drafts)</div>
+          <div className="metric-top">
+            <span className="metric-title">Pending Records (Drafts)</span>
+            <div className="metric-icon-well warning">
+              <FileText size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: data.pendingRecordsCount > 0 ? "var(--warning)" : "var(--text-main)" }}>
             {data.pendingRecordsCount}
           </div>
-          <div className="metric-desc">Encounters awaiting sign-off</div>
+          <div className="metric-footer">
+            <span>Encounters awaiting sign-off</span>
+          </div>
         </div>
       </div>
 
       {/* Patient Consultation Queue */}
       <div className="panel" style={{ marginBottom: 24 }}>
         <div className="panel-header">
-          <h3 className="panel-title">Today's Consultation Queue</h3>
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+          <h3 className="panel-title">
+            <Activity size={18} style={{ color: "var(--primary)" }} />
+            <span>Today's Consultation Queue</span>
+          </h3>
+          <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
             {data.consultationQueue.length} active patients
           </span>
         </div>
@@ -520,7 +613,7 @@ function DoctorDashboardView({ data }: { data: DoctorDashboardDto }) {
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ fontWeight: 600 }}>{c.patientName}</span>
                         {c.isEmergency && (
-                          <span style={{ background: "var(--danger-light)", color: "var(--danger)", fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 800 }}>
+                          <span style={{ background: "var(--danger-subtle)", color: "var(--danger)", fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 800 }}>
                             STAT EMERGENCY
                           </span>
                         )}
@@ -551,7 +644,10 @@ function DoctorDashboardView({ data }: { data: DoctorDashboardDto }) {
       <div className="dashboard-split-grid">
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Prescriptions Authored</h3>
+            <h3 className="panel-title">
+              <Pill size={18} style={{ color: "var(--primary)" }} />
+              <span>Recent Prescriptions Authored</span>
+            </h3>
             <Link href="/prescriptions" className="btn btn-sm btn-outline">View All</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -575,7 +671,10 @@ function DoctorDashboardView({ data }: { data: DoctorDashboardDto }) {
 
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Diagnostic Orders</h3>
+            <h3 className="panel-title">
+              <FlaskConical size={18} style={{ color: "var(--purple)" }} />
+              <span>Recent Diagnostic Orders</span>
+            </h3>
             <Link href="/laboratory" className="btn btn-sm btn-outline">View All</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -620,19 +719,40 @@ function NurseDashboardView({ data }: { data: NurseDashboardDto }) {
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Today's Scheduled Encounters</div>
+          <div className="metric-top">
+            <span className="metric-title">Today's Encounters</span>
+            <div className="metric-icon-well">
+              <Calendar size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--primary)" }}>{data.todayAppointmentsCount}</div>
-          <div className="metric-desc">Outpatients arriving for triage</div>
+          <div className="metric-footer">
+            <span>Outpatients arriving for triage</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">In-Progress Consultations</div>
+          <div className="metric-top">
+            <span className="metric-title">In-Progress Consults</span>
+            <div className="metric-icon-well warning">
+              <Activity size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--warning)" }}>{data.inProgressConsultationsCount}</div>
-          <div className="metric-desc">Doctors currently consulting</div>
+          <div className="metric-footer">
+            <span>Doctors currently consulting</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Hospital Patients</div>
+          <div className="metric-top">
+            <span className="metric-title">Hospital Registry</span>
+            <div className="metric-icon-well success">
+              <Users size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.totalActivePatients}</div>
-          <div className="metric-desc">Registered patient registry</div>
+          <div className="metric-footer">
+            <span>Total registered patients</span>
+          </div>
         </div>
       </div>
 
@@ -640,8 +760,11 @@ function NurseDashboardView({ data }: { data: NurseDashboardDto }) {
         {/* Today's Queue */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Active Patient Flow (Today)</h3>
-            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{data.todayPatientQueue.length} in queue</span>
+            <h3 className="panel-title">
+              <Clock size={18} style={{ color: "var(--primary)" }} />
+              <span>Active Patient Flow (Today)</span>
+            </h3>
+            <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>{data.todayPatientQueue.length} in queue</span>
           </div>
           <div style={{ padding: 16 }}>
             {data.todayPatientQueue.length === 0 ? (
@@ -667,7 +790,10 @@ function NurseDashboardView({ data }: { data: NurseDashboardDto }) {
         {/* Recent Vitals */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Vital Signs Recorded</h3>
+            <h3 className="panel-title">
+              <HeartPulse size={18} style={{ color: "var(--danger)" }} />
+              <span>Recent Vital Signs Recorded</span>
+            </h3>
             <Link href="/emr" className="btn btn-sm btn-outline">Vitals Ledger</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -723,26 +849,54 @@ function ReceptionistDashboardView({ data }: { data: ReceptionistDashboardDto })
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Today's Appointments</div>
+          <div className="metric-top">
+            <span className="metric-title">Today's Appointments</span>
+            <div className="metric-icon-well">
+              <Calendar size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.todaySummary.total}</div>
-          <div className="metric-desc">{data.todaySummary.confirmed} confirmed bookings</div>
+          <div className="metric-footer">
+            <span>{data.todaySummary.confirmed} confirmed bookings</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Waiting / In-Progress</div>
+          <div className="metric-top">
+            <span className="metric-title">In-Progress Triage</span>
+            <div className="metric-icon-well purple">
+              <Activity size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--primary)" }}>{data.todaySummary.inProgress}</div>
-          <div className="metric-desc">Patients currently with doctor</div>
+          <div className="metric-footer">
+            <span>Patients currently with doctor</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Pending Confirmation</div>
+          <div className="metric-top">
+            <span className="metric-title">Pending Confirmation</span>
+            <div className="metric-icon-well warning">
+              <Clock size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--warning)" }}>{data.todaySummary.pending}</div>
-          <div className="metric-desc">Awaiting receptionist check-in</div>
+          <div className="metric-footer">
+            <span>Awaiting receptionist check-in</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Uncollected Invoices</div>
+          <div className="metric-top">
+            <span className="metric-title">Uncollected Invoices</span>
+            <div className="metric-icon-well danger">
+              <CreditCard size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--danger)" }}>
             ₹{data.pendingInvoicesBalance.toLocaleString("en-IN")}
           </div>
-          <div className="metric-desc">{data.pendingInvoicesCount} invoices pending checkout</div>
+          <div className="metric-footer">
+            <span>{data.pendingInvoicesCount} invoices pending checkout</span>
+          </div>
         </div>
       </div>
 
@@ -824,24 +978,52 @@ function LabTechnicianDashboardView({ data }: { data: LabTechnicianDashboardDto 
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Awaiting Sample</div>
+          <div className="metric-top">
+            <span className="metric-title">Awaiting Sample</span>
+            <div className="metric-icon-well warning">
+              <FlaskConical size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--warning)" }}>{data.workflowSummary.awaitingSample}</div>
-          <div className="metric-desc">Ordered tests needing phlebotomy</div>
+          <div className="metric-footer">
+            <span>Ordered tests needing phlebotomy</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Samples Collected</div>
+          <div className="metric-top">
+            <span className="metric-title">Samples Collected</span>
+            <div className="metric-icon-well">
+              <CheckCircle2 size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--primary)" }}>{data.workflowSummary.sampleCollected}</div>
-          <div className="metric-desc">In laboratory receiving queue</div>
+          <div className="metric-footer">
+            <span>In laboratory receiving queue</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">In Processing</div>
+          <div className="metric-top">
+            <span className="metric-title">In Processing</span>
+            <div className="metric-icon-well purple">
+              <Activity size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--purple)" }}>{data.workflowSummary.processing}</div>
-          <div className="metric-desc">Tests currently running on analyzers</div>
+          <div className="metric-footer">
+            <span>Currently running on analyzers</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Pending Pathologist Review</div>
+          <div className="metric-top">
+            <span className="metric-title">Pending Review</span>
+            <div className="metric-icon-well success">
+              <FileText size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.workflowSummary.underReview}</div>
-          <div className="metric-desc">{data.workflowSummary.completed} tests finalized & approved</div>
+          <div className="metric-footer">
+            <span>{data.workflowSummary.completed} tests finalized & approved</span>
+          </div>
         </div>
       </div>
 
@@ -857,7 +1039,10 @@ function LabTechnicianDashboardView({ data }: { data: LabTechnicianDashboardDto 
       {/* Active Lab Orders Queue */}
       <div className="panel">
         <div className="panel-header">
-          <h3 className="panel-title">Active Laboratory Work Queue</h3>
+          <h3 className="panel-title">
+            <FlaskConical size={18} style={{ color: "var(--primary)" }} />
+            <span>Active Laboratory Work Queue</span>
+          </h3>
           <Link href="/laboratory" className="btn btn-sm btn-outline">Full Laboratory</Link>
         </div>
         <div className="table-responsive">
@@ -935,28 +1120,56 @@ function PharmacistDashboardView({ data }: { data: PharmacistDashboardDto }) {
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Pending Dispensing</div>
+          <div className="metric-top">
+            <span className="metric-title">Pending Dispensing</span>
+            <div className="metric-icon-well warning">
+              <Clock size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--warning)" }}>{data.prescriptionsQueue.pending}</div>
-          <div className="metric-desc">{data.prescriptionsQueue.partiallyDispensed} partially dispensed</div>
+          <div className="metric-footer">
+            <span>{data.prescriptionsQueue.partiallyDispensed} partially dispensed</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Dispensed Today</div>
+          <div className="metric-top">
+            <span className="metric-title">Dispensed Today</span>
+            <div className="metric-icon-well success">
+              <CheckCircle2 size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--success)" }}>{data.prescriptionsQueue.dispensedToday}</div>
-          <div className="metric-desc">Completed prescription fulfillments</div>
+          <div className="metric-footer">
+            <span>Completed fulfillments today</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Low Stock Medicines</div>
+          <div className="metric-top">
+            <span className="metric-title">Low Stock Formulary</span>
+            <div className="metric-icon-well danger">
+              <AlertTriangle size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: data.inventorySummary.lowStockCount > 0 ? "var(--danger)" : "var(--text-main)" }}>
             {data.inventorySummary.lowStockCount}
           </div>
-          <div className="metric-desc">Items at or below reorder level</div>
+          <div className="metric-footer">
+            <span>Medicines at/below reorder level</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Near-Expiry Batches</div>
+          <div className="metric-top">
+            <span className="metric-title">Near-Expiry Batches</span>
+            <div className="metric-icon-well warning">
+              <ShieldAlert size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: data.inventorySummary.nearExpiryCount > 0 ? "var(--warning)" : "var(--text-main)" }}>
             {data.inventorySummary.nearExpiryCount}
           </div>
-          <div className="metric-desc">Expiring within 30 days</div>
+          <div className="metric-footer">
+            <span>Expiring within 30 days</span>
+          </div>
         </div>
       </div>
 
@@ -964,7 +1177,10 @@ function PharmacistDashboardView({ data }: { data: PharmacistDashboardDto }) {
         {/* Dispensing Queue */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Prescriptions Awaiting Dispensing</h3>
+            <h3 className="panel-title">
+              <Pill size={18} style={{ color: "var(--primary)" }} />
+              <span>Prescriptions Awaiting Dispensing</span>
+            </h3>
             <Link href="/prescriptions" className="btn btn-sm btn-outline">View All</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -993,7 +1209,10 @@ function PharmacistDashboardView({ data }: { data: PharmacistDashboardDto }) {
         {/* Low Stock Items */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Low Stock Formulary Alerts</h3>
+            <h3 className="panel-title">
+              <Package size={18} style={{ color: "var(--danger)" }} />
+              <span>Low Stock Formulary Alerts</span>
+            </h3>
             <Link href="/pharmacy" className="btn btn-sm btn-outline">Inventory</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -1047,30 +1266,58 @@ function AccountantDashboardView({ data }: { data: AccountantDashboardDto }) {
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Total Billed Revenue</div>
+          <div className="metric-top">
+            <span className="metric-title">Total Billed Revenue</span>
+            <div className="metric-icon-well">
+              <CreditCard size={18} />
+            </div>
+          </div>
           <div className="metric-value">₹{data.financialMetrics.totalBilled.toLocaleString("en-IN")}</div>
-          <div className="metric-desc">From {data.financialMetrics.totalInvoices} non-void invoices</div>
+          <div className="metric-footer">
+            <span>From {data.financialMetrics.totalInvoices} non-void invoices</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Total Collected</div>
+          <div className="metric-top">
+            <span className="metric-title">Total Collected</span>
+            <div className="metric-icon-well success">
+              <TrendingUp size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--success)" }}>
             ₹{data.financialMetrics.totalCollected.toLocaleString("en-IN")}
           </div>
-          <div className="metric-desc">{data.statusBreakdown.paid} fully paid invoices</div>
+          <div className="metric-footer">
+            <span>{data.statusBreakdown.paid} fully paid invoices</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Outstanding Balance</div>
+          <div className="metric-top">
+            <span className="metric-title">Outstanding Balance</span>
+            <div className="metric-icon-well warning">
+              <AlertCircle size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: data.financialMetrics.outstandingBalance > 0 ? "var(--warning)" : "var(--success)" }}>
             ₹{data.financialMetrics.outstandingBalance.toLocaleString("en-IN")}
           </div>
-          <div className="metric-desc">Uncollected patient balances</div>
+          <div className="metric-footer">
+            <span>Uncollected patient balances</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Partially Paid / Due</div>
+          <div className="metric-top">
+            <span className="metric-title">Partially Paid / Due</span>
+            <div className="metric-icon-well danger">
+              <Receipt size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--danger)" }}>
             {data.statusBreakdown.partiallyPaid + data.statusBreakdown.issued}
           </div>
-          <div className="metric-desc">{data.statusBreakdown.overdue} overdue invoices</div>
+          <div className="metric-footer">
+            <span>{data.statusBreakdown.overdue} overdue invoices</span>
+          </div>
         </div>
       </div>
 
@@ -1078,7 +1325,10 @@ function AccountantDashboardView({ data }: { data: AccountantDashboardDto }) {
         {/* Recent Payments Received */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Cash Counter & Gateway Payments</h3>
+            <h3 className="panel-title">
+              <CreditCard size={18} style={{ color: "var(--success)" }} />
+              <span>Recent Cash Counter & Gateway Payments</span>
+            </h3>
             <Link href="/billing" className="btn btn-sm btn-outline">Ledger</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -1110,7 +1360,10 @@ function AccountantDashboardView({ data }: { data: AccountantDashboardDto }) {
         {/* Recent Invoices */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Hospital Invoices</h3>
+            <h3 className="panel-title">
+              <Receipt size={18} style={{ color: "var(--primary)" }} />
+              <span>Recent Hospital Invoices</span>
+            </h3>
             <Link href="/billing" className="btn btn-sm btn-outline">Invoices</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -1164,30 +1417,58 @@ function PatientDashboardView({ data }: { data: PatientDashboardDto }) {
 
       <div className="metrics-grid">
         <div className="metric-card">
-          <div className="metric-title">Upcoming Visits</div>
+          <div className="metric-top">
+            <span className="metric-title">Upcoming Visits</span>
+            <div className="metric-icon-well">
+              <Calendar size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--primary)" }}>
             {data.upcomingAppointments.length}
           </div>
-          <div className="metric-desc">Scheduled doctor consultations</div>
+          <div className="metric-footer">
+            <span>Scheduled doctor consultations</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Active Prescriptions</div>
+          <div className="metric-top">
+            <span className="metric-title">Active Prescriptions</span>
+            <div className="metric-icon-well purple">
+              <Pill size={18} />
+            </div>
+          </div>
           <div className="metric-value">{data.activePrescriptionsCount}</div>
-          <div className="metric-desc">Medications in your treatment plan</div>
+          <div className="metric-footer">
+            <span>Medications in active treatment</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Approved Lab Reports</div>
+          <div className="metric-top">
+            <span className="metric-title">Approved Lab Reports</span>
+            <div className="metric-icon-well success">
+              <CheckCircle2 size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: "var(--success)" }}>
             {data.approvedLabReportsCount}
           </div>
-          <div className="metric-desc">Completed & certified diagnostic tests</div>
+          <div className="metric-footer">
+            <span>Certified diagnostic tests</span>
+          </div>
         </div>
         <div className="metric-card">
-          <div className="metric-title">Outstanding Balance</div>
+          <div className="metric-top">
+            <span className="metric-title">Outstanding Balance</span>
+            <div className="metric-icon-well warning">
+              <CreditCard size={18} />
+            </div>
+          </div>
           <div className="metric-value" style={{ color: data.invoicesSummary.outstandingBalance > 0 ? "var(--warning)" : "var(--success)" }}>
             ₹{data.invoicesSummary.outstandingBalance.toLocaleString("en-IN")}
           </div>
-          <div className="metric-desc">{data.invoicesSummary.totalInvoices} total bills issued</div>
+          <div className="metric-footer">
+            <span>{data.invoicesSummary.totalInvoices} total bills issued</span>
+          </div>
         </div>
       </div>
 
@@ -1195,7 +1476,10 @@ function PatientDashboardView({ data }: { data: PatientDashboardDto }) {
         {/* Upcoming Appointments */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">My Upcoming Appointments</h3>
+            <h3 className="panel-title">
+              <Calendar size={18} style={{ color: "var(--primary)" }} />
+              <span>My Upcoming Appointments</span>
+            </h3>
             <Link href="/appointments" className="btn btn-sm btn-outline">Schedule</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -1227,7 +1511,10 @@ function PatientDashboardView({ data }: { data: PatientDashboardDto }) {
         {/* My Prescriptions */}
         <div className="panel">
           <div className="panel-header">
-            <h3 className="panel-title">Recent Prescriptions</h3>
+            <h3 className="panel-title">
+              <Pill size={18} style={{ color: "var(--primary)" }} />
+              <span>Recent Prescriptions</span>
+            </h3>
             <Link href="/prescriptions" className="btn btn-sm btn-outline">View All</Link>
           </div>
           <div style={{ padding: 16 }}>
@@ -1261,23 +1548,32 @@ function DashboardSkeleton() {
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
-        <div style={{ width: 280, height: 28, background: "#e2e8f0", borderRadius: 6, marginBottom: 8 }} />
-        <div style={{ width: 400, height: 16, background: "#f1f5f9", borderRadius: 4 }} />
+        <div className="skeleton" style={{ width: 280, height: 28, marginBottom: 8 }} />
+        <div className="skeleton" style={{ width: 400, height: 16 }} />
       </div>
 
       <div className="metrics-grid">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="metric-card" style={{ minHeight: 120 }}>
-            <div style={{ width: "60%", height: 14, background: "#e2e8f0", borderRadius: 4, marginBottom: 12 }} />
-            <div style={{ width: "40%", height: 32, background: "#e2e8f0", borderRadius: 6, marginBottom: 10 }} />
-            <div style={{ width: "80%", height: 12, background: "#f1f5f9", borderRadius: 4 }} />
+          <div key={i} className="metric-card" style={{ minHeight: 128 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+              <div className="skeleton" style={{ width: "50%", height: 14 }} />
+              <div className="skeleton" style={{ width: 36, height: 36, borderRadius: 8 }} />
+            </div>
+            <div className="skeleton" style={{ width: "35%", height: 32, marginBottom: 12 }} />
+            <div className="skeleton" style={{ width: "70%", height: 12 }} />
           </div>
         ))}
       </div>
 
       <div className="dashboard-split-grid">
-        <div className="panel" style={{ height: 280, background: "#f8fafc" }} />
-        <div className="panel" style={{ height: 280, background: "#f8fafc" }} />
+        <div className="panel" style={{ minHeight: 280, padding: 24 }}>
+          <div className="skeleton" style={{ width: 200, height: 20, marginBottom: 20 }} />
+          <div className="skeleton" style={{ width: "100%", height: 180 }} />
+        </div>
+        <div className="panel" style={{ minHeight: 280, padding: 24 }}>
+          <div className="skeleton" style={{ width: 200, height: 20, marginBottom: 20 }} />
+          <div className="skeleton" style={{ width: "100%", height: 180 }} />
+        </div>
       </div>
     </div>
   );

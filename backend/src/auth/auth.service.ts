@@ -2,6 +2,7 @@ import {
   Injectable,
   Inject,
   UnauthorizedException,
+  ConflictException,
   Logger,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -11,6 +12,7 @@ import { AuditAction } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RefreshTokenDto } from "./dto/refresh.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { AuthenticatedUser, JwtPayload } from "../common/interfaces/authenticated-user.interface";
 
 @Injectable()
@@ -332,5 +334,98 @@ export class AuthService {
     } catch (err) {
       this.logger.error("Failed to write authentication audit log", err);
     }
+  }
+
+  // ─── Hospital Registration ───────────────────────────────────────────────
+
+  async register(dto: RegisterDto, ipAddress?: string, userAgent?: string) {
+    const email = dto.email.trim().toLowerCase();
+
+    // 1. Check for duplicate email
+    const existingUser = await this.prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      this.logger.warn(`Registration attempt with duplicate email: ${email}`);
+      throw new ConflictException("An account with this email address already exists.");
+    }
+
+    // 2. Hash password using bcryptjs (consistent with existing auth service)
+    const passwordHash = bcrypt.hashSync(dto.password, 12);
+
+    // 3. Generate a unique hospital code from the hospital name
+    const baseCode = dto.hospitalName
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .substring(0, 12);
+    const suffix = crypto.randomBytes(2).toString("hex").toUpperCase();
+    const hospitalCode = `${baseCode}-${suffix}`;
+
+    // 4. Create hospital + user atomically in a transaction
+    const { hospital, user } = await this.prisma.$transaction(async (tx) => {
+      const hospital = await tx.hospital.create({
+        data: {
+          code: hospitalCode,
+          name: dto.hospitalName.trim(),
+          // Use registrant's email as the hospital's initial contact email
+          email: email,
+          // Placeholder phone — the administrator can update it after onboarding
+          phone: "+00-0000000000",
+          status: "ONBOARDING",
+        },
+      });
+
+      const user = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          firstName: dto.firstName.trim(),
+          lastName: dto.lastName.trim(),
+          // Assign HOSPITAL_ADMIN role; account inactive until administrator approves
+          role: "HOSPITAL_ADMIN",
+          hospitalId: hospital.id,
+          isActive: false,
+        },
+      });
+
+      return { hospital, user };
+    });
+
+    // 5. Record audit log (non-fatal if it fails)
+    await this.recordAuditLog(
+      hospital.id,
+      user.id,
+      AuditAction.CREATE,
+      "User",
+      user.id,
+      {
+        action: "HOSPITAL_REGISTRATION_REQUEST",
+        hospitalCode: hospital.code,
+        hospitalName: hospital.name,
+        // username is accepted from the form but stored only in audit details
+        // (the User model has no username column — no migration required)
+        username: dto.username,
+        status: "PENDING_APPROVAL",
+      },
+      ipAddress,
+      userAgent,
+    );
+
+    this.logger.log(
+      `New hospital registration request: ${hospital.name} [${hospital.code}] by ${email}`,
+    );
+
+    // 6. Return sanitized response — NO tokens (account is inactive / pending approval)
+    return {
+      userId: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      hospitalId: hospital.id,
+      hospitalName: hospital.name,
+      hospitalCode: hospital.code,
+      status: "PENDING_APPROVAL",
+    };
   }
 }

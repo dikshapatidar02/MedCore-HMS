@@ -143,7 +143,8 @@ export default function DepartmentsPage() {
       <div className="panel">
         <div className="panel-header">
           <div className="toolbar">
-            <div style={{ position: "relative" }}>
+            <div className="search-input-wrapper">
+              <Search size={15} className="search-input-icon" />
               <input
                 type="text"
                 className="search-input"
@@ -153,7 +154,7 @@ export default function DepartmentsPage() {
               />
             </div>
           </div>
-          <span style={{ fontSize: 13, color: "#64748b" }}>
+          <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 600 }}>
             Total: {deptData?.total ?? 0}
           </span>
         </div>
@@ -173,39 +174,34 @@ export default function DepartmentsPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
-                    Loading departments...
+                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                      <span className="spinner" style={{ width: 16, height: 16 }} />
+                      <span>Loading departments...</span>
+                    </div>
                   </td>
                 </tr>
               ) : deptData?.items && deptData.items.length > 0 ? (
                 deptData.items.map((d: any) => (
                   <tr key={d.id}>
                     <td>
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 12,
-                          background: "#e0f2fe",
-                          color: "#0369a1",
-                          padding: "3px 8px",
-                          borderRadius: 4,
-                        }}
-                      >
+                      <span className="mono-id">
                         {d.code}
                       </span>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 600 }}>{d.name}</div>
+                      <div style={{ fontWeight: 600, color: "var(--text-main)" }}>{d.name}</div>
                     </td>
-                    <td style={{ color: "#64748b", maxWidth: 360 }}>
+                    <td style={{ color: "var(--text-secondary)", maxWidth: 360 }}>
                       {d.description || "—"}
                     </td>
                     <td>
-                      <span className="badge-active" style={{ padding: "2px 8px", borderRadius: 4, fontSize: 12 }}>
-                        {d._count?.doctors ?? 0} doctors
+                      <span className="status-badge badge-active">
+                        <span className="badge-dot" />
+                        <span>{d._count?.doctors ?? 0} doctors</span>
                       </span>
                     </td>
-                    <td>{d._count?.rooms ?? 0}</td>
+                    <td style={{ color: "var(--text-secondary)", fontWeight: 500 }}>{d._count?.rooms ?? 0}</td>
                     {canManage && (
                       <td style={{ textAlign: "right" }}>
                         <div style={{ display: "inline-flex", gap: 6 }}>
@@ -217,8 +213,8 @@ export default function DepartmentsPage() {
                             <Edit2 size={13} />
                           </button>
                           <button
-                            className="btn btn-secondary btn-sm"
-                            style={{ color: "#ef4444" }}
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: "var(--danger)" }}
                             onClick={() => handleDelete(d)}
                             title="Delete Department"
                           >
@@ -231,8 +227,8 @@ export default function DepartmentsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
-                    No departments found.
+                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                    No departments found matching criteria.
                   </td>
                 </tr>
               )}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../lib/auth-context";
-import { apiRequest, API_BASE } from "../lib/api";
+import { apiRequest, API_BASE, getStoredToken } from "../lib/api";
 import {
   HeartPulse,
   Pill,
@@ -63,9 +63,9 @@ export default function PatientPortalPage() {
 
   const downloadPrescriptionPdf = async (rxId: string) => {
     try {
-      const token = localStorage.getItem("medcore_token");
+      const token = getStoredToken();
       const res = await fetch(`${API_BASE}/prescriptions/${rxId}/pdf`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!res.ok) throw new Error("Failed to download PDF.");
       const blob = await res.blob();

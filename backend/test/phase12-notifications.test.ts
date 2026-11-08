@@ -759,6 +759,18 @@ async function runPhase12Tests() {
     targetDate.setDate(targetDate.getDate() + 10);
     const dateStr = targetDate.toISOString().split("T")[0];
 
+    const rescheduleDate = new Date();
+    rescheduleDate.setDate(rescheduleDate.getDate() + 12);
+    const reschedDateStr = rescheduleDate.toISOString().split("T")[0];
+
+    // Clean any leftover appointments from prior test runs for these slots
+    await prisma.appointment.deleteMany({
+      where: {
+        patientId: apexPatient.id,
+        appointmentDate: { in: [new Date(dateStr), new Date(reschedDateStr)] },
+      },
+    });
+
     const appt = await appointmentsService.create(
       {
         patientId: apexPatient.id,

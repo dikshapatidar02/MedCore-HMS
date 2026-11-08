@@ -42,7 +42,8 @@ export class StorageService {
         !secretKey.includes("REPLACE_WITH")
     );
 
-    this.baseUrl = process.env.BACKEND_URL || "http://localhost:3001/api/v1";
+    const rawBackendUrl = (process.env.BACKEND_URL || "http://localhost:3001").trim().replace(/\/+$/, "");
+    this.baseUrl = rawBackendUrl.endsWith("/api/v1") ? rawBackendUrl : `${rawBackendUrl}/api/v1`;
     this.localStorageDir = path.resolve(process.cwd(), "uploads");
 
     if (this.isS3Configured) {

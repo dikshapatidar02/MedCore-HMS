@@ -33,7 +33,19 @@ export class ReminderQueueService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit() {
-    const redisHost = process.env.REDIS_HOST || "localhost";
+    const rawRedisHost = process.env.REDIS_HOST;
+    // When REDIS_HOST is unconfigured or empty (e.g. ₹0 free-tier deployment), run in direct fallback mode without connecting to localhost
+    if (!rawRedisHost || rawRedisHost.trim() === "") {
+      this.isRedisConnected = false;
+      this.reminderQueue = null;
+      this.reminderWorker = null;
+      this.logger.log(
+        "REDIS_HOST is unconfigured. BullMQ appointment reminder queue disabled (running in direct fallback mode)."
+      );
+      return;
+    }
+
+    const redisHost = rawRedisHost.trim();
     const redisPort = parseInt(process.env.REDIS_PORT || "6379", 10);
     const redisPassword = process.env.REDIS_PASSWORD || undefined;
     const redisTls = process.env.REDIS_TLS === "true" ? {} : undefined;
@@ -63,6 +75,17 @@ export class ReminderQueueService implements OnModuleInit, OnModuleDestroy {
           concurrency: parseInt(process.env.WORKER_CONCURRENCY || "5", 10),
         }
       );
+
+      // Register safe error listeners to prevent uncaught exceptions if Redis disconnects
+      this.reminderQueue.on("error", (err) => {
+        this.logger.warn(`BullMQ reminder queue error: ${err.message}`);
+        this.isRedisConnected = false;
+      });
+
+      this.reminderWorker.on("error", (err) => {
+        this.logger.warn(`BullMQ reminder worker error: ${err.message}`);
+        this.isRedisConnected = false;
+      });
 
       this.reminderWorker.on("completed", (job) => {
         this.logger.log(`Reminder job ${job.id} completed successfully.`);
@@ -133,7 +156,7 @@ export class ReminderQueueService implements OnModuleInit, OnModuleDestroy {
 
     const scheduled: string[] = [];
 
-    if (this.reminderQueue) {
+    if (this.reminderQueue && this.isRedisConnected) {
       try {
         if (target24h > now) {
           const delay24h = target24h - now;

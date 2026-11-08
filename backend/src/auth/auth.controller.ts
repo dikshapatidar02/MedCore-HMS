@@ -8,11 +8,13 @@ import {
   Req,
   UseGuards,
   Inject,
+  ValidationPipe,
 } from "@nestjs/common";
 import { Request } from "express";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RefreshTokenDto } from "./dto/refresh.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { Public } from "./decorators/public.decorator";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
@@ -22,6 +24,26 @@ import { AuthRateLimiterGuard } from "./guards/auth-rate-limiter.guard";
 @Controller("auth")
 export class AuthController {
   constructor(@Inject(AuthService) private readonly authService: AuthService) {}
+
+  @Public()
+  @UseGuards(AuthRateLimiterGuard)
+  @Post("register")
+  @HttpCode(HttpStatus.CREATED)
+  async register(
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true, expectedType: RegisterDto }))
+    registerDto: RegisterDto,
+    @Req() req: Request,
+  ) {
+    const ipAddress = req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers["user-agent"];
+    const result = await this.authService.register(registerDto, ipAddress, userAgent);
+    return {
+      success: true,
+      data: result,
+      message:
+        "Hospital registration request submitted successfully. Your account will be activated by a system administrator.",
+    };
+  }
 
   @Public()
   @UseGuards(AuthRateLimiterGuard)

@@ -192,13 +192,16 @@ export default function DoctorsPage() {
       <div className="panel">
         <div className="panel-header">
           <div className="toolbar">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search by name, specialization, license..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <div className="search-input-wrapper">
+              <Search size={15} className="search-input-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search by name, specialization, license..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
 
             <select
               className="select-input"
@@ -214,7 +217,7 @@ export default function DoctorsPage() {
             </select>
           </div>
 
-          <span style={{ fontSize: 13, color: "#64748b" }}>
+          <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 600 }}>
             Total: {doctorsData?.total ?? 0}
           </span>
         </div>
@@ -234,42 +237,36 @@ export default function DoctorsPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
-                    Loading doctors...
+                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                      <span className="spinner" style={{ width: 16, height: 16 }} />
+                      <span>Loading doctors...</span>
+                    </div>
                   </td>
                 </tr>
               ) : doctorsData?.items && doctorsData.items.length > 0 ? (
                 doctorsData.items.map((doc: any) => (
                   <tr key={doc.id}>
                     <td>
-                      <div style={{ fontWeight: 600 }}>
+                      <div style={{ fontWeight: 600, color: "var(--text-main)" }}>
                         Dr. {doc.user.firstName} {doc.user.lastName}
                       </div>
-                      <div style={{ fontSize: 12, color: "#64748b" }}>{doc.user.email}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{doc.user.email}</div>
                     </td>
                     <td>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          fontSize: 12,
-                          background: "#e0f2fe",
-                          color: "#0369a1",
-                          padding: "3px 8px",
-                          borderRadius: 4,
-                        }}
-                      >
+                      <span className="status-badge badge-confirmed">
                         {doc.department.name}
                       </span>
                     </td>
                     <td>{doc.specialization}</td>
                     <td>
-                      <span style={{ fontSize: 12, fontFamily: "monospace", color: "#475569" }}>
+                      <span className="mono-id">
                         {doc.licenseNumber}
                       </span>
                     </td>
                     <td>
                       <div style={{ fontSize: 13 }}>
-                        <strong>{doc.experienceYears} yrs</strong> &middot; ₹{doc.consultationFee}
+                        <strong>{doc.experienceYears} yrs</strong> &middot; ₹{doc.consultationFee.toLocaleString("en-IN")}
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
@@ -284,8 +281,8 @@ export default function DoctorsPage() {
                         </button>
                         {isStaff && (
                           <button
-                            className="btn btn-secondary btn-sm"
-                            style={{ color: "#ef4444" }}
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: "var(--danger)" }}
                             onClick={() => handleDeleteDoctor(doc)}
                             title="Soft Delete Doctor"
                           >
@@ -298,8 +295,8 @@ export default function DoctorsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
-                    No doctors found.
+                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                    No doctors found matching criteria.
                   </td>
                 </tr>
               )}

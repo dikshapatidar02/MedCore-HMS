@@ -211,13 +211,16 @@ export default function AppointmentsPage() {
       <div className="panel">
         <div className="panel-header">
           <div className="toolbar">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search by patient, reason, MRN..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <div className="search-input-wrapper">
+              <Search size={15} className="search-input-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search by patient, reason, MRN..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
 
             <select
               className="select-input"
@@ -234,7 +237,7 @@ export default function AppointmentsPage() {
             </select>
           </div>
 
-          <span style={{ fontSize: 13, color: "#64748b" }}>
+          <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 600 }}>
             Total: {appointmentsData?.total ?? 0}
           </span>
         </div>
@@ -254,8 +257,11 @@ export default function AppointmentsPage() {
             <tbody>
               {loadingAppts ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
-                    Loading appointments...
+                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                      <span className="spinner" style={{ width: 16, height: 16 }} />
+                      <span>Loading appointments...</span>
+                    </div>
                   </td>
                 </tr>
               ) : appointmentsData?.items && appointmentsData.items.length > 0 ? (
@@ -265,47 +271,51 @@ export default function AppointmentsPage() {
                   return (
                     <tr key={appt.id}>
                       <td>
-                        <div style={{ fontWeight: 600 }}>
+                        <div style={{ fontWeight: 600, color: "var(--text-main)" }}>
                           {appt.patient.firstName} {appt.patient.lastName}
                         </div>
-                        <div style={{ fontSize: 11, color: "#0284c7" }}>
-                          MRN: {appt.patient.mrn}
+                        <div style={{ marginTop: 2 }}>
+                          <span className="mono-id">
+                            {appt.patient.mrn}
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600 }}>
+                        <div style={{ fontWeight: 600, color: "var(--text-main)" }}>
                           Dr. {appt.doctor.user.firstName} {appt.doctor.user.lastName}
                         </div>
-                        <div style={{ fontSize: 12, color: "#64748b" }}>
+                        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
                           {appt.department.name}
                         </div>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600 }}>
+                        <div style={{ fontWeight: 600, color: "var(--text-main)" }}>
                           {new Date(appt.appointmentDate).toLocaleDateString()}
                         </div>
-                        <div style={{ fontSize: 12, color: "#0284c7" }}>
+                        <div style={{ fontSize: 12, color: "var(--primary)", fontWeight: 600 }}>
                           {appt.startTime} – {appt.endTime}
                         </div>
                       </td>
                       <td>
                         <span
                           style={{
-                            fontSize: 11,
+                            fontSize: 10.5,
                             fontWeight: 700,
-                            color: "#475569",
+                            color: "var(--text-muted)",
                             textTransform: "uppercase",
+                            letterSpacing: "0.04em",
                           }}
                         >
                           {appt.type}
                         </span>
-                        <div style={{ fontSize: 13, color: "#334155", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <div style={{ fontSize: 13, color: "var(--text-secondary)", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {appt.reason}
                         </div>
                       </td>
                       <td>
                         <span className={`status-badge badge-${appt.status.toLowerCase()}`}>
-                          {appt.status}
+                          <span className="badge-dot" />
+                          <span>{appt.status}</span>
                         </span>
                       </td>
                       <td style={{ textAlign: "right" }}>
@@ -314,7 +324,7 @@ export default function AppointmentsPage() {
                           {!isPatient && appt.status === "PENDING" && (
                             <button
                               className="btn btn-secondary btn-sm"
-                              style={{ color: "#0284c7" }}
+                              style={{ color: "var(--primary)" }}
                               onClick={() => statusMutation.mutate({ id: appt.id, status: "CONFIRMED" })}
                               title="Confirm Appointment"
                             >
@@ -326,7 +336,7 @@ export default function AppointmentsPage() {
                           {!isPatient && appt.status === "CONFIRMED" && (
                             <button
                               className="btn btn-secondary btn-sm"
-                              style={{ color: "#7c3aed" }}
+                              style={{ color: "var(--purple)" }}
                               onClick={() => statusMutation.mutate({ id: appt.id, status: "IN_PROGRESS" })}
                               title="Begin Consultation"
                             >
@@ -338,7 +348,7 @@ export default function AppointmentsPage() {
                           {!isPatient && appt.status === "IN_PROGRESS" && (
                             <button
                               className="btn btn-secondary btn-sm"
-                              style={{ color: "#16a34a" }}
+                              style={{ color: "var(--success)" }}
                               onClick={() => statusMutation.mutate({ id: appt.id, status: "COMPLETED" })}
                               title="Complete Consultation"
                             >
@@ -358,8 +368,8 @@ export default function AppointmentsPage() {
                                 <span>Reschedule</span>
                               </button>
                               <button
-                                className="btn btn-secondary btn-sm"
-                                style={{ color: "#ef4444" }}
+                                className="btn btn-ghost btn-sm"
+                                style={{ color: "var(--danger)" }}
                                 onClick={() => handleOpenCancel(appt)}
                                 title="Cancel Appointment"
                               >
@@ -375,7 +385,7 @@ export default function AppointmentsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
+                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
                     No appointments found matching filter criteria.
                   </td>
                 </tr>

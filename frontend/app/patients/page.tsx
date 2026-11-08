@@ -221,15 +221,18 @@ export default function PatientsPage() {
         <div className="panel">
           <div className="panel-header">
             <div className="toolbar">
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search by MRN, name, phone, email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+              <div className="search-input-wrapper">
+                <Search size={15} className="search-input-icon" />
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search by MRN, name, phone, email..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
             </div>
-            <span style={{ fontSize: 13, color: "#64748b" }}>
+            <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 600 }}>
               Total: {patientsData?.total ?? 0}
             </span>
           </div>
@@ -250,34 +253,27 @@ export default function PatientsPage() {
               <tbody>
                 {loadingPatients ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: "center", padding: 30 }}>
-                      Loading patient registry...
+                    <td colSpan={7} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                        <span className="spinner" style={{ width: 16, height: 16 }} />
+                        <span>Loading patient registry...</span>
+                      </div>
                     </td>
                   </tr>
                 ) : patientsData?.items && patientsData.items.length > 0 ? (
                   patientsData.items.map((pat: any) => (
                     <tr key={pat.id}>
                       <td>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontFamily: "monospace",
-                            fontSize: 12,
-                            background: "#e0f2fe",
-                            color: "#0369a1",
-                            padding: "3px 8px",
-                            borderRadius: 4,
-                          }}
-                        >
+                        <span className="mono-id">
                           {pat.mrn}
                         </span>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600 }}>
+                        <div style={{ fontWeight: 600, color: "var(--text-main)" }}>
                           {pat.firstName} {pat.lastName}
                         </div>
                         {pat.email && (
-                          <div style={{ fontSize: 11, color: "#64748b" }}>{pat.email}</div>
+                          <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{pat.email}</div>
                         )}
                       </td>
                       <td>
@@ -286,7 +282,7 @@ export default function PatientsPage() {
                       </td>
                       <td>
                         <div>{pat.phone}</div>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>
+                        <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
                           Emerg: {pat.emergencyContactName} ({pat.emergencyContactPhone})
                         </div>
                       </td>
@@ -296,8 +292,9 @@ export default function PatientsPage() {
                           : "No address recorded"}
                       </td>
                       <td>
-                        <span className="badge-confirmed" style={{ padding: "2px 8px", borderRadius: 4, fontSize: 12 }}>
-                          {pat._count?.appointments ?? 0} booked
+                        <span className="status-badge badge-confirmed">
+                          <span className="badge-dot" />
+                          <span>{pat._count?.appointments ?? 0} booked</span>
                         </span>
                       </td>
                       <td style={{ textAlign: "right" }}>
@@ -312,8 +309,8 @@ export default function PatientsPage() {
                           </button>
                           {user?.role === "SUPER_ADMIN" || user?.role === "HOSPITAL_ADMIN" ? (
                             <button
-                              className="btn btn-secondary btn-sm"
-                              style={{ color: "#ef4444" }}
+                              className="btn btn-ghost btn-sm"
+                              style={{ color: "var(--danger)" }}
                               onClick={() => {
                                 if (confirm(`Soft-delete record for patient ${pat.firstName} ${pat.lastName}?`)) {
                                   deletePatientMutation.mutate(pat.id);
@@ -330,8 +327,8 @@ export default function PatientsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: "center", padding: 30 }}>
-                      No patient records found.
+                    <td colSpan={7} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                      No patient records found matching criteria.
                     </td>
                   </tr>
                 )}

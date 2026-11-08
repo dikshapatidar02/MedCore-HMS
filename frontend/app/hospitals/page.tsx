@@ -144,37 +144,43 @@ export default function HospitalsPage() {
               <tbody>
                 {loadingAll ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
-                      Loading hospital directory...
+                    <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                        <span className="spinner" style={{ width: 16, height: 16 }} />
+                        <span>Loading hospital directory...</span>
+                      </div>
                     </td>
                   </tr>
                 ) : hospitalsData?.items && hospitalsData.items.length > 0 ? (
                   hospitalsData.items.map((h: any) => (
                     <tr key={h.id}>
                       <td>
-                        <div style={{ fontWeight: 600 }}>{h.name}</div>
-                        <div style={{ fontSize: 11, color: "#0284c7" }}>CODE: {h.code}</div>
+                        <div style={{ fontWeight: 600, color: "var(--text-main)" }}>{h.name}</div>
+                        <div style={{ marginTop: 2 }}>
+                          <span className="mono-id">{h.code}</span>
+                        </div>
                       </td>
-                      <td>{h.email}</td>
-                      <td>{h.phone}</td>
+                      <td style={{ color: "var(--text-secondary)" }}>{h.email}</td>
+                      <td style={{ color: "var(--text-secondary)" }}>{h.phone}</td>
                       <td>
                         {h.address ? `${h.address.city}, ${h.address.state}` : "No address registered"}
                       </td>
                       <td>
                         <span className={`status-badge badge-${h.status.toLowerCase()}`}>
-                          {h.status}
+                          <span className="badge-dot" />
+                          <span>{h.status}</span>
                         </span>
                       </td>
                       <td>
-                        <div style={{ fontSize: 12 }}>
-                          {h._count?.departments ?? 0} depts &middot; {h._count?.doctors ?? 0} doctors
+                        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                          <strong>{h._count?.departments ?? 0}</strong> depts &middot; <strong>{h._count?.doctors ?? 0}</strong> doctors
                         </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: "center", padding: 30 }}>
+                    <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "var(--text-muted)" }}>
                       No hospitals found.
                     </td>
                   </tr>

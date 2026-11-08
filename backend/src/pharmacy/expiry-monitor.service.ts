@@ -24,12 +24,34 @@ export class ExpiryMonitorService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const redisHost = process.env.REDIS_HOST || "localhost";
+    const rawRedisHost = process.env.REDIS_HOST;
+    // When REDIS_HOST is unconfigured or empty (e.g. ₹0 free-tier deployment), run in direct mode without connecting to localhost
+    if (!rawRedisHost || rawRedisHost.trim() === "") {
+      this.expiryQueue = null;
+      this.expiryWorker = null;
+      this.logger.log(
+        "REDIS_HOST is unconfigured. BullMQ pharmacy expiry monitoring worker disabled."
+      );
+      return;
+    }
+
+    const redisHost = rawRedisHost.trim();
     const redisPort = parseInt(process.env.REDIS_PORT || "6379", 10);
+    const redisPassword = process.env.REDIS_PASSWORD || undefined;
+    const redisTls = process.env.REDIS_TLS === "true" ? {} : undefined;
+
+    const connectionOptions: any = {
+      host: redisHost,
+      port: redisPort,
+      password: redisPassword,
+      tls: redisTls,
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+    };
 
     try {
       this.expiryQueue = new Queue("pharmacy-expiry-checks", {
-        connection: { host: redisHost, port: redisPort },
+        connection: connectionOptions,
       });
 
       this.expiryWorker = new Worker(
@@ -38,8 +60,17 @@ export class ExpiryMonitorService implements OnModuleInit {
           this.logger.log(`Executing expiry check job: ${job.id}`);
           return this.runExpiryCheck();
         },
-        { connection: { host: redisHost, port: redisPort } }
+        { connection: connectionOptions }
       );
+
+      // Register safe error listeners to prevent uncaught exceptions if Redis disconnects
+      this.expiryQueue.on("error", (err) => {
+        this.logger.warn(`BullMQ pharmacy expiry queue error: ${err.message}`);
+      });
+
+      this.expiryWorker.on("error", (err) => {
+        this.logger.warn(`BullMQ pharmacy expiry worker error: ${err.message}`);
+      });
 
       this.expiryWorker.on("completed", (job) => {
         this.logger.log(`Expiry monitoring job ${job.id} completed successfully.`);

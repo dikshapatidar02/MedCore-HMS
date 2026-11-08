@@ -26,103 +26,125 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
-export enum UserRole {
-  SUPER_ADMIN = "SUPER_ADMIN",
-  HOSPITAL_ADMIN = "HOSPITAL_ADMIN",
-  DOCTOR = "DOCTOR",
-  NURSE = "NURSE",
-  RECEPTIONIST = "RECEPTIONIST",
-  LAB_TECHNICIAN = "LAB_TECHNICIAN",
-  PHARMACIST = "PHARMACIST",
-  ACCOUNTANT = "ACCOUNTANT",
-  PATIENT = "PATIENT",
-}
+export const UserRole = {
+  SUPER_ADMIN: "SUPER_ADMIN",
+  HOSPITAL_ADMIN: "HOSPITAL_ADMIN",
+  DOCTOR: "DOCTOR",
+  NURSE: "NURSE",
+  RECEPTIONIST: "RECEPTIONIST",
+  LAB_TECHNICIAN: "LAB_TECHNICIAN",
+  PHARMACIST: "PHARMACIST",
+  ACCOUNTANT: "ACCOUNTANT",
+  PATIENT: "PATIENT",
+} as const;
 
-export enum HospitalStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  SUSPENDED = "SUSPENDED",
-  ONBOARDING = "ONBOARDING",
-}
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
-export enum Gender {
-  MALE = "MALE",
-  FEMALE = "FEMALE",
-  OTHER = "OTHER",
-  PREFER_NOT_TO_SAY = "PREFER_NOT_TO_SAY",
-}
+export const HospitalStatus = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  SUSPENDED: "SUSPENDED",
+  ONBOARDING: "ONBOARDING",
+} as const;
 
-export enum AppointmentStatus {
-  PENDING = "PENDING",
-  CONFIRMED = "CONFIRMED",
-  IN_PROGRESS = "IN_PROGRESS",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-  NO_SHOW = "NO_SHOW",
-}
+export type HospitalStatus = (typeof HospitalStatus)[keyof typeof HospitalStatus];
 
-export enum AppointmentType {
-  CONSULTATION = "CONSULTATION",
-  FOLLOW_UP = "FOLLOW_UP",
-  EMERGENCY = "EMERGENCY",
-  ROUTINE_CHECKUP = "ROUTINE_CHECKUP",
-}
+export const Gender = {
+  MALE: "MALE",
+  FEMALE: "FEMALE",
+  OTHER: "OTHER",
+  PREFER_NOT_TO_SAY: "PREFER_NOT_TO_SAY",
+} as const;
 
-export enum PrescriptionStatus {
-  PENDING = "PENDING",
-  DISPENSED = "DISPENSED",
-  PARTIALLY_DISPENSED = "PARTIALLY_DISPENSED",
-  CANCELLED = "CANCELLED",
-}
+export type Gender = (typeof Gender)[keyof typeof Gender];
 
-export enum LabOrderStatus {
-  ORDERED = "ORDERED",
-  PENDING = "PENDING",
-  SAMPLE_COLLECTED = "SAMPLE_COLLECTED",
-  PROCESSING = "PROCESSING",
-  IN_PROGRESS = "IN_PROGRESS",
-  RESULT_UPLOADED = "RESULT_UPLOADED",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  APPROVED = "APPROVED",
-  REJECTED = "REJECTED",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-}
+export const AppointmentStatus = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  IN_PROGRESS: "IN_PROGRESS",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+  NO_SHOW: "NO_SHOW",
+} as const;
 
-export enum LabPriority {
-  ROUTINE = "ROUTINE",
-  URGENT = "URGENT",
-  STAT = "STAT",
-}
+export type AppointmentStatus = (typeof AppointmentStatus)[keyof typeof AppointmentStatus];
 
-export enum InvoiceStatus {
-  DRAFT = "DRAFT",
-  ISSUED = "ISSUED",
-  PAID = "PAID",
-  PARTIALLY_PAID = "PARTIALLY_PAID",
-  OVERDUE = "OVERDUE",
-  VOID = "VOID",
-}
+export const AppointmentType = {
+  CONSULTATION: "CONSULTATION",
+  FOLLOW_UP: "FOLLOW_UP",
+  EMERGENCY: "EMERGENCY",
+  ROUTINE_CHECKUP: "ROUTINE_CHECKUP",
+} as const;
 
-export enum PaymentStatus {
-  INITIATED = "INITIATED",
-  PENDING = "PENDING",
-  COMPLETED = "COMPLETED",
-  SUCCESS = "SUCCESS",
-  FAILED = "FAILED",
-  REFUNDED = "REFUNDED",
-}
+export type AppointmentType = (typeof AppointmentType)[keyof typeof AppointmentType];
 
-export enum PaymentMethod {
-  CASH = "CASH",
-  CREDIT_CARD = "CREDIT_CARD",
-  DEBIT_CARD = "DEBIT_CARD",
-  UPI = "UPI",
-  NET_BANKING = "NET_BANKING",
-  INSURANCE = "INSURANCE",
-  STRIPE = "STRIPE",
-  RAZORPAY = "RAZORPAY",
-}
+export const PrescriptionStatus = {
+  PENDING: "PENDING",
+  DISPENSED: "DISPENSED",
+  PARTIALLY_DISPENSED: "PARTIALLY_DISPENSED",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type PrescriptionStatus = (typeof PrescriptionStatus)[keyof typeof PrescriptionStatus];
+
+export const LabOrderStatus = {
+  ORDERED: "ORDERED",
+  PENDING: "PENDING",
+  SAMPLE_COLLECTED: "SAMPLE_COLLECTED",
+  PROCESSING: "PROCESSING",
+  IN_PROGRESS: "IN_PROGRESS",
+  RESULT_UPLOADED: "RESULT_UPLOADED",
+  UNDER_REVIEW: "UNDER_REVIEW",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type LabOrderStatus = (typeof LabOrderStatus)[keyof typeof LabOrderStatus];
+
+export const LabPriority = {
+  ROUTINE: "ROUTINE",
+  URGENT: "URGENT",
+  STAT: "STAT",
+} as const;
+
+export type LabPriority = (typeof LabPriority)[keyof typeof LabPriority];
+
+export const InvoiceStatus = {
+  DRAFT: "DRAFT",
+  ISSUED: "ISSUED",
+  PAID: "PAID",
+  PARTIALLY_PAID: "PARTIALLY_PAID",
+  OVERDUE: "OVERDUE",
+  VOID: "VOID",
+} as const;
+
+export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
+
+export const PaymentStatus = {
+  INITIATED: "INITIATED",
+  PENDING: "PENDING",
+  COMPLETED: "COMPLETED",
+  SUCCESS: "SUCCESS",
+  FAILED: "FAILED",
+  REFUNDED: "REFUNDED",
+} as const;
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
+export const PaymentMethod = {
+  CASH: "CASH",
+  CREDIT_CARD: "CREDIT_CARD",
+  DEBIT_CARD: "DEBIT_CARD",
+  UPI: "UPI",
+  NET_BANKING: "NET_BANKING",
+  INSURANCE: "INSURANCE",
+  STRIPE: "STRIPE",
+  RAZORPAY: "RAZORPAY",
+} as const;
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 
 export interface AddressDto {
   id?: string;
@@ -292,25 +314,31 @@ export interface AppointmentDto {
   };
 }
 
-export enum RecordStatus {
-  DRAFT = "DRAFT",
-  FINALIZED = "FINALIZED",
-  AMENDED = "AMENDED",
-}
+export const RecordStatus = {
+  DRAFT: "DRAFT",
+  FINALIZED: "FINALIZED",
+  AMENDED: "AMENDED",
+} as const;
 
-export enum DiagnosisType {
-  PRIMARY = "PRIMARY",
-  SECONDARY = "SECONDARY",
-  PROVISIONAL = "PROVISIONAL",
-  FINAL = "FINAL",
-}
+export type RecordStatus = (typeof RecordStatus)[keyof typeof RecordStatus];
 
-export enum AllergySeverity {
-  MILD = "MILD",
-  MODERATE = "MODERATE",
-  SEVERE = "SEVERE",
-  LIFE_THREATENING = "LIFE_THREATENING",
-}
+export const DiagnosisType = {
+  PRIMARY: "PRIMARY",
+  SECONDARY: "SECONDARY",
+  PROVISIONAL: "PROVISIONAL",
+  FINAL: "FINAL",
+} as const;
+
+export type DiagnosisType = (typeof DiagnosisType)[keyof typeof DiagnosisType];
+
+export const AllergySeverity = {
+  MILD: "MILD",
+  MODERATE: "MODERATE",
+  SEVERE: "SEVERE",
+  LIFE_THREATENING: "LIFE_THREATENING",
+} as const;
+
+export type AllergySeverity = (typeof AllergySeverity)[keyof typeof AllergySeverity];
 
 export interface MedicalRecordAmendmentDto {
   id: string;
@@ -509,7 +537,7 @@ export interface PatientClinicalOverviewDto {
 // ==========================================
 
 export interface SuperAdminDashboardDto {
-  role: UserRole.SUPER_ADMIN;
+  role: typeof UserRole.SUPER_ADMIN;
   totalHospitals: number;
   activeHospitals: number;
   onboardingHospitals: number;
@@ -537,7 +565,7 @@ export interface SuperAdminDashboardDto {
 }
 
 export interface HospitalAdminDashboardDto {
-  role: UserRole.HOSPITAL_ADMIN;
+  role: typeof UserRole.HOSPITAL_ADMIN;
   hospitalName: string;
   hospitalCode: string;
   totalPatients: number;
@@ -582,7 +610,7 @@ export interface HospitalAdminDashboardDto {
 }
 
 export interface DoctorDashboardDto {
-  role: UserRole.DOCTOR;
+  role: typeof UserRole.DOCTOR;
   doctorId: string;
   specialization: string;
   departmentName: string;
@@ -622,7 +650,7 @@ export interface DoctorDashboardDto {
 }
 
 export interface NurseDashboardDto {
-  role: UserRole.NURSE;
+  role: typeof UserRole.NURSE;
   hospitalName: string;
   todayAppointmentsCount: number;
   inProgressConsultationsCount: number;
@@ -650,7 +678,7 @@ export interface NurseDashboardDto {
 }
 
 export interface ReceptionistDashboardDto {
-  role: UserRole.RECEPTIONIST;
+  role: typeof UserRole.RECEPTIONIST;
   hospitalName: string;
   todaySummary: {
     total: number;
@@ -685,7 +713,7 @@ export interface ReceptionistDashboardDto {
 }
 
 export interface LabTechnicianDashboardDto {
-  role: UserRole.LAB_TECHNICIAN;
+  role: typeof UserRole.LAB_TECHNICIAN;
   hospitalName: string;
   workflowSummary: {
     awaitingSample: number;
@@ -710,7 +738,7 @@ export interface LabTechnicianDashboardDto {
 }
 
 export interface PharmacistDashboardDto {
-  role: UserRole.PHARMACIST;
+  role: typeof UserRole.PHARMACIST;
   hospitalName: string;
   prescriptionsQueue: {
     pending: number;
@@ -742,7 +770,7 @@ export interface PharmacistDashboardDto {
 }
 
 export interface AccountantDashboardDto {
-  role: UserRole.ACCOUNTANT;
+  role: typeof UserRole.ACCOUNTANT;
   hospitalName: string;
   financialMetrics: {
     totalInvoices: number;
@@ -779,7 +807,7 @@ export interface AccountantDashboardDto {
 }
 
 export interface PatientDashboardDto {
-  role: UserRole.PATIENT;
+  role: typeof UserRole.PATIENT;
   patientName: string;
   mrn: string;
   hospitalName: string;
