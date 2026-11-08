@@ -12,7 +12,7 @@ services:
     # Monorepo build: installs dependencies, generates Prisma client using pinned workspace version, and compiles NestJS.
     # CRITICAL: Database migrations are intentionally DECOUPLED from the build step
     # to protect against unintended schema mutations or build lock failures.
-    buildCommand: corepack enable && corepack prepare pnpm@9.15.9 --activate && pnpm install --frozen-lockfile && pnpm --filter @medcore/backend run prisma:generate && pnpm --filter @medcore/backend build
+    buildCommand: corepack enable && corepack prepare pnpm@9.15.9 --activate && pnpm install --frozen-lockfile --prod=false && pnpm --filter @medcore/backend run prisma:generate && pnpm --filter @medcore/backend build
     # Starts the compiled NestJS production server from the monorepo root
     startCommand: node backend/dist/src/main.js
     # Active health check endpoint returning HTTP 200 (fails with 503 if DB is unreachable)
