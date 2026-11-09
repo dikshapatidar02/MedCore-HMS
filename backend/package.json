@@ -28,7 +28,10 @@
     "test:phase15": "tsx test/phase15-smoke.test.ts",
     "validate:env": "tsx scripts/validate-env.ts",
     "prisma:migrate:status": "prisma migrate status",
-    "prisma:migrate:prod": "tsx scripts/deploy-migrations.ts"
+    "prisma:migrate:prod": "tsx scripts/deploy-migrations.ts",
+    "bootstrap:admin": "tsx scripts/bootstrap-superadmin.ts",
+    "test:admin-onboarding": "tsx test/phase-admin-onboarding-activation.test.ts",
+    "test:admin-unit": "tsx test/admin-onboarding-activation.unit.test.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

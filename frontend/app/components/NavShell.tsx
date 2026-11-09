@@ -380,6 +380,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
         return [
           { label: "Overview", href: "/", icon: LayoutDashboard, section: "Core" },
           { label: "Hospitals", href: "/hospitals", icon: Building2, section: "Tenants" },
+          { label: "Users & Governance", href: "/users", icon: Users, section: "Governance" },
           { label: "Departments", href: "/departments", icon: Layers, section: "Operations" },
           { label: "Doctors", href: "/doctors", icon: Stethoscope, section: "Operations" },
           { label: "Patients", href: "/patients", icon: Users, section: "Clinical" },
@@ -394,6 +395,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
       case "HOSPITAL_ADMIN":
         return [
           { label: "Dashboard", href: "/", icon: LayoutDashboard, section: "Core" },
+          { label: "Users & Staff", href: "/users", icon: Users, section: "Hospital" },
           { label: "Departments", href: "/departments", icon: Layers, section: "Hospital" },
           { label: "Doctors", href: "/doctors", icon: Stethoscope, section: "Hospital" },
           { label: "Patients", href: "/patients", icon: Users, section: "Clinical Care" },
@@ -479,6 +481,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
     if (match) return match.label;
     if (currentPath === "/portal") return "Patient Health Portal";
     if (currentPath === "/hospitals") return "Hospital Organizations";
+    if (currentPath === "/users") return "User Administration & Governance";
     return "Clinical Workspace";
   };
 

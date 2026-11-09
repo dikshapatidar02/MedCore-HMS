@@ -5,7 +5,7 @@ import {
   ForbiddenException,
   BadRequestException,
 } from "@nestjs/common";
-import { UserRole } from "@prisma/client";
+import { UserRole, HospitalStatus, AuditAction } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { AuthenticatedUser } from "../common/interfaces/authenticated-user.interface";
 
@@ -426,5 +426,180 @@ export class HospitalsService {
     }
 
     return invoice;
+  }
+
+  /**
+   * Retrieves all hospital registration requests in ONBOARDING status.
+   * Scoped exclusively to Platform Super Administrators.
+   */
+  async getPendingRegistrations() {
+    return this.prisma.hospital.findMany({
+      where: { status: HospitalStatus.ONBOARDING },
+      include: {
+        address: true,
+        users: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            role: true,
+            isActive: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: {
+            users: true,
+            departments: true,
+            doctors: true,
+            patients: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  /**
+   * Approves a pending hospital registration request.
+   * Validates status transition from ONBOARDING -> ACTIVE.
+   * Activates the initial hospital administrator accounts and writes an audit log.
+   */
+  async approveHospital(
+    id: string,
+    approvingUser: AuthenticatedUser,
+    ipAddress?: string,
+    userAgent?: string
+  ) {
+    const hospital = await this.prisma.hospital.findUnique({
+      where: { id },
+      include: { address: true },
+    });
+
+    if (!hospital) {
+      throw new NotFoundException("Hospital not found.");
+    }
+
+    if (hospital.status !== HospitalStatus.ONBOARDING) {
+      throw new BadRequestException(
+        `Invalid status transition: Only hospitals in ONBOARDING status can be approved. Current status is ${hospital.status}.`
+      );
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const h = await tx.hospital.update({
+        where: { id },
+        data: { status: HospitalStatus.ACTIVE },
+        include: { address: true },
+      });
+
+      // Activate all initial hospital administrator accounts for this hospital
+      await tx.user.updateMany({
+        where: { hospitalId: id, role: UserRole.HOSPITAL_ADMIN },
+        data: { isActive: true },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          hospitalId: id,
+          userId: approvingUser.id,
+          action: AuditAction.UPDATE,
+          entityName: "Hospital",
+          entityId: id,
+          details: {
+            action: "HOSPITAL_APPROVAL",
+            previousStatus: hospital.status,
+            newStatus: HospitalStatus.ACTIVE,
+            approvedBy: approvingUser.email,
+            approvedAt: new Date().toISOString(),
+          },
+          ipAddress,
+          userAgent,
+        },
+      });
+
+      return h;
+    });
+
+    return updated;
+  }
+
+  /**
+   * Rejects a pending hospital registration request.
+   * Validates status transition from ONBOARDING -> INACTIVE.
+   * Ensures users remain inactive, revokes any tokens, and writes an audit log with reason.
+   */
+  async rejectHospital(
+    id: string,
+    reason: string | undefined,
+    rejectingUser: AuthenticatedUser,
+    ipAddress?: string,
+    userAgent?: string
+  ) {
+    const hospital = await this.prisma.hospital.findUnique({
+      where: { id },
+      include: { address: true },
+    });
+
+    if (!hospital) {
+      throw new NotFoundException("Hospital not found.");
+    }
+
+    if (hospital.status !== HospitalStatus.ONBOARDING) {
+      throw new BadRequestException(
+        `Invalid status transition: Only hospitals in ONBOARDING status can be rejected. Current status is ${hospital.status}.`
+      );
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const h = await tx.hospital.update({
+        where: { id },
+        data: { status: HospitalStatus.INACTIVE },
+        include: { address: true },
+      });
+
+      // Ensure users remain inactive and revoke any active refresh tokens
+      await tx.user.updateMany({
+        where: { hospitalId: id },
+        data: { isActive: false },
+      });
+
+      const users = await tx.user.findMany({
+        where: { hospitalId: id },
+        select: { id: true },
+      });
+
+      if (users.length > 0) {
+        await tx.refreshToken.deleteMany({
+          where: { userId: { in: users.map((u) => u.id) } },
+        });
+      }
+
+      await tx.auditLog.create({
+        data: {
+          hospitalId: id,
+          userId: rejectingUser.id,
+          action: AuditAction.UPDATE,
+          entityName: "Hospital",
+          entityId: id,
+          details: {
+            action: "HOSPITAL_REJECTION",
+            previousStatus: hospital.status,
+            newStatus: HospitalStatus.INACTIVE,
+            rejectedBy: rejectingUser.email,
+            rejectedAt: new Date().toISOString(),
+            reason: reason?.trim() || "Registration request rejected by platform administrator",
+          },
+          ipAddress,
+          userAgent,
+        },
+      });
+
+      return h;
+    });
+
+    return updated;
   }
 }

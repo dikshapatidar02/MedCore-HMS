@@ -4,10 +4,13 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Query,
+  Req,
   UseGuards,
   Inject,
 } from "@nestjs/common";
+import { Request } from "express";
 import { UserRole } from "@prisma/client";
 import { HospitalsService } from "./hospitals.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -91,6 +94,52 @@ export class HospitalsController {
       success: true,
       data,
       message: "Hospital updated successfully (Super Admin)",
+    };
+  }
+
+  @Get("pending-registrations")
+  @Roles(UserRole.SUPER_ADMIN)
+  async getPendingRegistrations() {
+    const data = await this.hospitalsService.getPendingRegistrations();
+    return {
+      success: true,
+      data,
+      message: "Pending hospital registrations retrieved successfully",
+    };
+  }
+
+  @Post(":id/approve")
+  @Roles(UserRole.SUPER_ADMIN)
+  async approveHospital(
+    @Param("id") id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request
+  ) {
+    const ipAddress = req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers["user-agent"];
+    const data = await this.hospitalsService.approveHospital(id, user, ipAddress, userAgent);
+    return {
+      success: true,
+      data,
+      message: "Hospital and administrator account approved and activated successfully",
+    };
+  }
+
+  @Post(":id/reject")
+  @Roles(UserRole.SUPER_ADMIN)
+  async rejectHospital(
+    @Param("id") id: string,
+    @Body() body: { reason?: string },
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request
+  ) {
+    const ipAddress = req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers["user-agent"];
+    const data = await this.hospitalsService.rejectHospital(id, body?.reason, user, ipAddress, userAgent);
+    return {
+      success: true,
+      data,
+      message: "Hospital registration request rejected successfully",
     };
   }
 

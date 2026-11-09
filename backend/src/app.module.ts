@@ -22,12 +22,14 @@ import { PaymentsModule } from "./payments/payments.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { StorageModule } from "./common/storage/storage.module";
+import { UsersModule } from "./users/users.module";
 
 @Module({
   imports: [
     PrismaModule,
     HealthModule,
     AuthModule,
+    UsersModule,
     HospitalsModule,
     DepartmentsModule,
     DoctorsModule,
