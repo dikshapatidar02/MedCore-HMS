@@ -2,6 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap, Inject } from "@nestjs/comm
 import { PrismaService } from "../prisma/prisma.service";
 import { UserRole, AuditAction } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
+import { seedDemoData } from "./demo-seed";
 
 @Injectable()
 export class BootstrapService implements OnApplicationBootstrap {
@@ -10,6 +11,11 @@ export class BootstrapService implements OnApplicationBootstrap {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async onApplicationBootstrap() {
+    await this.bootstrapSuperAdmin();
+    await this.bootstrapDemoHospital();
+  }
+
+  private async bootstrapSuperAdmin() {
     const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
     const password = process.env.BOOTSTRAP_ADMIN_PASSWORD;
 
@@ -65,5 +71,18 @@ export class BootstrapService implements OnApplicationBootstrap {
       this.logger.error("Automated SUPER_ADMIN bootstrap encountered an error:", error.message || error);
     }
   }
-}
 
+  private async bootstrapDemoHospital() {
+    try {
+      if (!this.prisma.address?.upsert || !this.prisma.hospital?.upsert) {
+        return;
+      }
+      await seedDemoData(this.prisma, {
+        log: (msg: string) => this.logger.log(msg),
+        error: (msg: string, ...args: any[]) => this.logger.error(msg, ...args),
+      });
+    } catch (error: any) {
+      this.logger.error("Automated Demo Hospital bootstrap encountered an error:", error.message || error);
+    }
+  }
+}

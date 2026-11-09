@@ -239,19 +239,92 @@ export function NavShell({ children }: { children: React.ReactNode }) {
     };
   }, [user, pathname]);
 
-  const isDevMode = process.env.NODE_ENV !== "production";
+  const [demoLoggingInRole, setDemoLoggingInRole] = useState<string | null>(null);
 
-  const demoAccounts = [
-    { label: "Super Admin", email: "superadmin@medcore.io", badge: "Global" },
-    { label: "Hospital Admin", email: "admin.apex@medcore.io", badge: "Hospital" },
-    { label: "Doctor", email: "dr.arun.sharma@apexhealth.org", badge: "Clinical" },
-    { label: "Nurse", email: "nurse.apex@medcore.io", badge: "Nursing" },
-    { label: "Pharmacist", email: "pharma.apex@medcore.io", badge: "Pharmacy" },
-    { label: "Lab Tech", email: "lab.apex@medcore.io", badge: "Diagnostics" },
-    { label: "Accountant", email: "billing.apex@medcore.io", badge: "Finance" },
-    { label: "Receptionist", email: "reception.apex@medcore.io", badge: "Front Desk" },
-    { label: "Patient", email: "patient.rajesh.sharma0@example.com", badge: "Portal" },
+  const DEMO_PASSWORD = "Demo@MedCore2026";
+
+  const PRIMARY_DEMO_ROLES = [
+    {
+      roleKey: "HOSPITAL_ADMIN",
+      label: "Hospital Admin",
+      fullName: "Rajesh Singhania",
+      email: "demo.admin@medcore.io",
+      badge: "Admin",
+      desc: "Staff governance, departments, audit logs & hospital settings",
+      icon: Building2,
+    },
+    {
+      roleKey: "DOCTOR",
+      label: "Doctor (Cardiology)",
+      fullName: "Dr. Arun Sharma",
+      email: "demo.doctor@medcore.io",
+      badge: "Clinical",
+      desc: "Appointments, EMR notes, vital signs, prescriptions & lab reviews",
+      icon: Stethoscope,
+    },
+    {
+      roleKey: "NURSE",
+      label: "Registered Nurse",
+      fullName: "Sunita Menon",
+      email: "demo.nurse@medcore.io",
+      badge: "Station",
+      desc: "Patient care station, triage queue, vital signs & active directories",
+      icon: Activity,
+    },
+    {
+      roleKey: "RECEPTIONIST",
+      label: "Front Desk Officer",
+      fullName: "Neha Verma",
+      email: "demo.receptionist@medcore.io",
+      badge: "Front Desk",
+      desc: "Patient intake registration, appointment booking & cashier checkout",
+      icon: Calendar,
+    },
   ];
+
+  const SECONDARY_DEMO_ROLES = [
+    {
+      roleKey: "PHARMACIST",
+      label: "Chief Pharmacist",
+      email: "demo.pharma@medcore.io",
+      badge: "Pharmacy",
+      icon: Pill,
+    },
+    {
+      roleKey: "LAB_TECHNICIAN",
+      label: "Laboratory Specialist",
+      email: "demo.lab@medcore.io",
+      badge: "Laboratory",
+      icon: FlaskConical,
+    },
+    {
+      roleKey: "ACCOUNTANT",
+      label: "Financial Accountant",
+      email: "demo.billing@medcore.io",
+      badge: "Finance",
+      icon: CreditCard,
+    },
+  ];
+
+  const handleDemoQuickLogin = async (email: string, roleKey: string) => {
+    setLoginEmail(email);
+    setLoginPassword(DEMO_PASSWORD);
+    setLoginError(null);
+    setLoginEmailErr(null);
+    setLoginPasswordErr(null);
+    setDemoLoggingInRole(roleKey);
+    setIsSubmitting(true);
+    try {
+      await login(email, DEMO_PASSWORD);
+    } catch (err: any) {
+      setLoginError(
+        err.message || "Failed to authenticate demo account. Please verify backend status."
+      );
+    } finally {
+      setIsSubmitting(false);
+      setDemoLoggingInRole(null);
+    }
+  };
 
   // ─── Login validation ──────────────────────────────────────────────────
   const validateLoginField = useCallback((field: "email" | "password", value: string) => {
@@ -813,35 +886,86 @@ export function NavShell({ children }: { children: React.ReactNode }) {
                     </button>
                   </div>
 
-                  {/* Developer quick-fill */}
-                  {isDevMode && (
-                    <div className="auth-devtools">
-                      <div className="auth-devtools-header">
-                        <span>Dev Quick-Fill</span>
-                        <span className="auth-devtools-badge">Demo Only</span>
+                  {/* Public Demonstration Access */}
+                  <div className="demo-access-section">
+                    <div className="demo-access-header">
+                      <div className="demo-access-title">
+                        <KeyRound size={15} style={{ color: "#166534" }} />
+                        <span>Explore MedCore HMS Demo</span>
                       </div>
-                      <div className="auth-devtools-grid">
-                        {demoAccounts.map((acc) => (
+                      <span className="demo-access-badge">1-Click Live Access</span>
+                    </div>
+
+                    <p className="demo-access-subtitle">
+                      Instant evaluation access with pre-configured active clinical accounts. Click any role below to launch:
+                    </p>
+
+                    <div className="demo-roles-grid">
+                      {PRIMARY_DEMO_ROLES.map((role) => {
+                        const Icon = role.icon;
+                        const isRoleLoading = demoLoggingInRole === role.roleKey;
+                        return (
                           <button
-                            key={acc.email}
+                            key={role.email}
                             type="button"
-                            className="auth-devtool-btn"
-                            onClick={() => {
-                              setLoginEmail(acc.email);
-                              setLoginPassword("DemoPassword@123");
-                              setLoginError(null);
-                              setLoginEmailErr(null);
-                              setLoginPasswordErr(null);
-                            }}
-                            title={acc.email}
+                            className="demo-role-card"
+                            onClick={() => handleDemoQuickLogin(role.email, role.roleKey)}
+                            disabled={isSubmitting}
+                            title={`1-Click login as ${role.label} (${role.email})`}
                           >
-                            <span className="auth-devtool-badge">{acc.badge}</span>
-                            <span>{acc.label}</span>
+                            <div className="demo-role-top">
+                              <span className="demo-role-name flex items-center gap-1.5">
+                                {isRoleLoading ? (
+                                  <Loader2 size={13} className="animate-spin text-sky-600" />
+                                ) : (
+                                  <Icon size={13} className="text-sky-600" />
+                                )}
+                                <span>{role.label}</span>
+                              </span>
+                              <span className="demo-role-badge">{role.badge}</span>
+                            </div>
+                            <span className="demo-role-desc">{role.desc}</span>
                           </button>
-                        ))}
+                        );
+                      })}
+                    </div>
+
+                    <div className="demo-supporting-wrapper">
+                      <div className="demo-supporting-label">Supporting Staff Roles:</div>
+                      <div className="demo-supporting-roles">
+                        {SECONDARY_DEMO_ROLES.map((role) => {
+                          const Icon = role.icon;
+                          const isRoleLoading = demoLoggingInRole === role.roleKey;
+                          return (
+                            <button
+                              key={role.email}
+                              type="button"
+                              className="demo-supporting-btn"
+                              onClick={() => handleDemoQuickLogin(role.email, role.roleKey)}
+                              disabled={isSubmitting}
+                              title={`1-Click login as ${role.label} (${role.email})`}
+                            >
+                              {isRoleLoading ? (
+                                <Loader2 size={12} className="animate-spin text-sky-600" />
+                              ) : (
+                                <Icon size={12} className="text-sky-600" />
+                              )}
+                              <span>{role.label}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
-                  )}
+
+                    <div className="demo-credentials-footer">
+                      <span>Shared Demo Password:</span>
+                      <code className="demo-credentials-pwd">Demo@MedCore2026</code>
+                    </div>
+
+                    <p className="demo-synthetic-notice">
+                      All demo accounts operate on pre-seeded synthetic clinical data for MedCore Demo Hospital (DEMO-MAIN). Platform Super Admin credentials remain private and isolated.
+                    </p>
+                  </div>
 
                   <div className="auth-compliance-footer">
                     <Shield size={13} style={{ color: "#10b981" }} />

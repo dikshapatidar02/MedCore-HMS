@@ -30,8 +30,10 @@
     "prisma:migrate:status": "prisma migrate status",
     "prisma:migrate:prod": "tsx scripts/deploy-migrations.ts",
     "bootstrap:admin": "tsx scripts/bootstrap-superadmin.ts",
+    "bootstrap:demo": "tsx scripts/bootstrap-demo.ts",
     "test:admin-onboarding": "tsx test/phase-admin-onboarding-activation.test.ts",
-    "test:admin-unit": "tsx test/admin-onboarding-activation.unit.test.ts"
+    "test:admin-unit": "tsx test/admin-onboarding-activation.unit.test.ts",
+    "test:demo-unit": "tsx test/demo-access.unit.test.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
