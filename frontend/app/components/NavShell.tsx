@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../lib/auth-context";
@@ -26,6 +26,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Lock,
   Hospital,
   Eye,
@@ -213,10 +214,40 @@ export function NavShell({ children }: { children: React.ReactNode }) {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setUserMenuOpen(false);
   }, [pathname]);
+
+  // Click outside and Escape key handler for user dropdown
+  useEffect(() => {
+    if (!userMenuOpen) return;
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [userMenuOpen]);
 
   useEffect(() => {
     if (!user) return;
@@ -552,6 +583,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
   const getPageTitle = (currentPath: string) => {
     const match = navItems.find((n) => n.href === currentPath);
     if (match) return match.label;
+    if (currentPath === "/profile") return "My Profile & Account";
     if (currentPath === "/portal") return "Patient Health Portal";
     if (currentPath === "/hospitals") return "Hospital Organizations";
     if (currentPath === "/users") return "User Administration & Governance";
@@ -1273,11 +1305,13 @@ export function NavShell({ children }: { children: React.ReactNode }) {
 
   const hospitalDisplayName =
     (user as any)?.hospital?.name ||
-    (user?.hospitalId === "hosp-apex-001"
-      ? "Apex Multispecialty Hospital"
-      : user?.hospitalId
-        ? user.hospitalId
-        : "Multi-Tenant Platform");
+    (user?.hospitalId === "hosp-demo-001"
+      ? "MedCore Demo Hospital"
+      : user?.hospitalId === "hosp-apex-001"
+        ? "Apex Multispecialty Hospital"
+        : user?.hospitalId
+          ? user.hospitalId
+          : "Global Platform System");
 
   return (
     <div className="app-container">
@@ -1459,14 +1493,125 @@ export function NavShell({ children }: { children: React.ReactNode }) {
               )}
             </Link>
 
-            <div className="navbar-user-card">
-              <div className="user-avatar-circle">{userInitials}</div>
-              <div className="user-meta-info" style={{ paddingRight: 4 }}>
-                <div className="user-meta-name">
-                  {user?.firstName} {user?.lastName}
+            {/* User Account Avatar & Dropdown Menu */}
+            <div className="navbar-user-dropdown-wrapper" ref={userMenuRef}>
+              <button
+                type="button"
+                className="navbar-user-card navbar-user-card-clickable"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+                aria-label={`User account menu for ${user?.firstName} ${user?.lastName}`}
+                title="Open user profile & account menu"
+              >
+                <div className="user-avatar-circle">{userInitials}</div>
+                <div className="user-meta-info" style={{ paddingRight: 2 }}>
+                  <div className="user-meta-name">
+                    {user?.firstName} {user?.lastName}
+                  </div>
+                  <div className="user-meta-role">{formatRoleName(user?.role)}</div>
                 </div>
-                <div className="user-meta-role">{formatRoleName(user?.role)}</div>
-              </div>
+                <ChevronDown
+                  size={14}
+                  className={`user-menu-chevron ${userMenuOpen ? "user-menu-chevron-open" : ""}`}
+                />
+              </button>
+
+              {userMenuOpen && (
+                <div
+                  className="user-dropdown-menu"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  {/* Header / User Info */}
+                  <div className="user-dropdown-header">
+                    <div className="user-dropdown-avatar-wrap">
+                      <div className="user-dropdown-avatar">{userInitials}</div>
+                      <div className="user-dropdown-details">
+                        <div className="user-dropdown-name">
+                          {user?.firstName} {user?.lastName}
+                        </div>
+                        <div className="user-dropdown-email">{user?.email}</div>
+                      </div>
+                    </div>
+                    <div className="user-dropdown-badges">
+                      <span className="user-dropdown-role-badge">
+                        {formatRoleName(user?.role)}
+                      </span>
+                      <span className="user-dropdown-hospital-badge" title={hospitalDisplayName}>
+                        <Hospital size={12} />
+                        <span>{hospitalDisplayName}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="user-dropdown-divider" />
+
+                  {/* Menu Options */}
+                  <div className="user-dropdown-items" role="none">
+                    <Link
+                      href="/profile"
+                      role="menuitem"
+                      className="user-dropdown-item"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <User size={15} className="user-dropdown-item-icon" />
+                      <div className="user-dropdown-item-content">
+                        <span className="user-dropdown-item-title">My Profile</span>
+                        <span className="user-dropdown-item-sub">View account credentials &amp; details</span>
+                      </div>
+                    </Link>
+
+                    {user?.role === "SUPER_ADMIN" && (
+                      <Link
+                        href="/hospitals"
+                        role="menuitem"
+                        className="user-dropdown-item"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Building2 size={15} className="user-dropdown-item-icon" />
+                        <div className="user-dropdown-item-content">
+                          <span className="user-dropdown-item-title">Hospital Organizations</span>
+                          <span className="user-dropdown-item-sub">Manage platform tenants</span>
+                        </div>
+                      </Link>
+                    )}
+
+                    {(user?.role === "SUPER_ADMIN" || user?.role === "HOSPITAL_ADMIN") && (
+                      <Link
+                        href="/users"
+                        role="menuitem"
+                        className="user-dropdown-item"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Users size={15} className="user-dropdown-item-icon" />
+                        <div className="user-dropdown-item-content">
+                          <span className="user-dropdown-item-title">Users &amp; Governance</span>
+                          <span className="user-dropdown-item-sub">Manage staff &amp; approvals</span>
+                        </div>
+                      </Link>
+                    )}
+                  </div>
+
+                  <div className="user-dropdown-divider" />
+
+                  {/* Logout Button */}
+                  <div className="user-dropdown-footer" role="none">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="user-dropdown-logout-btn"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        logout();
+                      }}
+                    >
+                      <LogOut size={15} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button

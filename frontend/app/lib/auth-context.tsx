@@ -18,8 +18,20 @@ export interface UserSession {
   firstName: string;
   lastName: string;
   phone?: string;
-  doctorProfile?: { id: string; specialization: string; departmentId: string };
-  patientProfile?: { id: string; mrn: string };
+  doctorProfile?: {
+    id: string;
+    specialization: string;
+    departmentId: string;
+    licenseNumber?: string;
+    consultationFee?: number;
+    department?: { id: string; name: string; code: string };
+  };
+  patientProfile?: {
+    id: string;
+    mrn: string;
+    bloodGroup?: string;
+    gender?: string;
+  };
   hospital?: { id: string; name: string; code: string; status: string };
 }
 
