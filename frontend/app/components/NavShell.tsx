@@ -218,14 +218,46 @@ export function NavShell({ children }: { children: React.ReactNode }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
+  // Track viewport width for responsive sidebar behavior
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isSidebarOpen = isMobile ? mobileMenuOpen : !sidebarCollapsed;
+
+  const handleToggleSidebar = useCallback(() => {
+    const isMobileView = typeof window !== "undefined" && window.innerWidth <= 768;
+    if (isMobileView) {
+      setMobileMenuOpen((prev) => !prev);
+    } else {
+      setSidebarCollapsed((prev) => !prev);
+    }
+  }, []);
+
+  const handleCloseSidebar = useCallback(() => {
+    const isMobileView = typeof window !== "undefined" && window.innerWidth <= 768;
+    if (isMobileView) {
+      setMobileMenuOpen(false);
+    } else {
+      setSidebarCollapsed(true);
+    }
+  }, []);
+
   useEffect(() => {
     setMobileMenuOpen(false);
     setUserMenuOpen(false);
   }, [pathname]);
 
-  // Click outside and Escape key handler for user dropdown
+  // Click outside and Escape key handler for user dropdown and mobile drawer
   useEffect(() => {
-    if (!userMenuOpen) return;
+    if (!userMenuOpen && !mobileMenuOpen) return;
 
     const handlePointerDown = (e: MouseEvent | TouchEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
@@ -236,6 +268,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setUserMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     };
 
@@ -1350,23 +1383,14 @@ export function NavShell({ children }: { children: React.ReactNode }) {
             )}
           </Link>
           <button
-            className="sidebar-toggle-btn mobile-close-btn"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close Mobile Navigation"
+            type="button"
+            className="sidebar-toggle-btn sidebar-header-close-btn"
+            onClick={handleCloseSidebar}
+            aria-label="Close navigation"
+            title="Close navigation"
           >
             <X size={18} />
           </button>
-          {!mobileMenuOpen && (
-            <button
-              className="sidebar-toggle-btn"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              style={{ display: "none" }}
-            >
-              {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </button>
-          )}
         </div>
 
         <nav className="sidebar-nav">
@@ -1416,11 +1440,13 @@ export function NavShell({ children }: { children: React.ReactNode }) {
         <header className="top-navbar">
           <div className="navbar-left">
             <button
-              className="mobile-hamburger-btn"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open Navigation Menu"
+              type="button"
+              className="navbar-sidebar-toggle-btn mobile-hamburger-btn"
+              onClick={handleToggleSidebar}
+              aria-label={isSidebarOpen ? "Close navigation" : "Open navigation"}
+              title={isSidebarOpen ? "Close navigation" : "Open navigation"}
             >
-              <Menu size={20} />
+              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
             {/* MedCore HMS Main Application Identity in Top Navbar */}
