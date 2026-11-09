@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../lib/auth-context";
 import { apiRequest, API_BASE } from "../lib/api";
+import { cleanHospitalName } from "../lib/branding";
 import {
   Building2,
   Stethoscope,
@@ -1303,15 +1304,17 @@ export function NavShell({ children }: { children: React.ReactNode }) {
     ((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")) ||
     (user?.email?.[0] || "U").toUpperCase();
 
-  const hospitalDisplayName =
+  const rawHospitalName =
     (user as any)?.hospital?.name ||
     (user?.hospitalId === "hosp-demo-001"
-      ? "MedCore Demo Hospital"
+      ? "MedCore Hospital"
       : user?.hospitalId === "hosp-apex-001"
         ? "Apex Multispecialty Hospital"
         : user?.hospitalId
           ? user.hospitalId
           : "Global Platform System");
+
+  const hospitalDisplayName = cleanHospitalName(rawHospitalName);
 
   return (
     <div className="app-container">
@@ -1328,17 +1331,24 @@ export function NavShell({ children }: { children: React.ReactNode }) {
           }`}
       >
         <div className="sidebar-header">
-          <div className="sidebar-brand">
+          <Link
+            href="/"
+            className="sidebar-brand"
+            title="MedCore HMS — Enterprise Healthcare System"
+          >
             <div className="sidebar-brand-icon">
               <Activity size={20} />
             </div>
             {!sidebarCollapsed && (
               <div className="sidebar-brand-text">
-                <span className="sidebar-brand-title">MedCore HMS</span>
-                <span className="sidebar-brand-sub">Clinical SaaS</span>
+                <div className="sidebar-brand-title">
+                  <span className="brand-primary-text">MedCore</span>
+                  <span className="brand-hms-badge">HMS</span>
+                </div>
+                <span className="sidebar-brand-sub">Enterprise Healthcare</span>
               </div>
             )}
-          </div>
+          </Link>
           <button
             className="sidebar-toggle-btn mobile-close-btn"
             onClick={() => setMobileMenuOpen(false)}
@@ -1412,11 +1422,24 @@ export function NavShell({ children }: { children: React.ReactNode }) {
             >
               <Menu size={20} />
             </button>
+
+            {/* MedCore HMS Main Application Identity in Top Navbar */}
+            <Link href="/" className="navbar-app-brand" title="MedCore HMS Dashboard">
+              <div className="navbar-app-brand-icon">
+                <Activity size={15} />
+              </div>
+              <div className="navbar-app-brand-text">
+                <span className="navbar-brand-name">MedCore</span>
+                <span className="navbar-brand-accent">HMS</span>
+              </div>
+            </Link>
+
+            <span className="navbar-brand-divider" aria-hidden="true" />
+
             <div className="navbar-breadcrumbs">
-              <span className="navbar-breadcrumbs-item">MedCore</span>
-              <span style={{ color: "#cbd5e1" }}>/</span>
               <span className="navbar-breadcrumbs-current">{getPageTitle(pathname)}</span>
             </div>
+
             <div className="navbar-hospital-pill">
               <Hospital size={13} />
               <span>{hospitalDisplayName}</span>

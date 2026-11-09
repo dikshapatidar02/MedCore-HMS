@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "./lib/auth-context";
 import { apiRequest } from "./lib/api";
+import { cleanHospitalName, cleanHospitalCode } from "./lib/branding";
 import {
   DashboardStatsResponse,
   SuperAdminDashboardDto,
@@ -273,9 +274,9 @@ function SuperAdminDashboardView({ data }: { data: SuperAdminDashboardDto }) {
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{h.name}</div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{cleanHospitalName(h.name)}</div>
                       <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                        Code: {h.code} &middot; City: {h.city} &middot; {h.departmentsCount} Depts, {h.doctorsCount} Doctors
+                        Code: {cleanHospitalCode(h.code)} &middot; City: {h.city} &middot; {h.departmentsCount} Depts, {h.doctorsCount} Doctors
                       </div>
                     </div>
                     <div>
@@ -302,9 +303,9 @@ function HospitalAdminDashboardView({ data }: { data: HospitalAdminDashboardDto 
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">{data.hospitalName}</h1>
+          <h1 className="page-title">{cleanHospitalName(data.hospitalName)}</h1>
           <div className="page-subtitle">
-            Hospital Administration & Scoped Clinical Operations ({data.hospitalCode})
+            Hospital Administration & Scoped Clinical Operations ({cleanHospitalCode(data.hospitalCode)})
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -709,7 +710,7 @@ function NurseDashboardView({ data }: { data: NurseDashboardDto }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">Nursing Station & Triage</h1>
-          <div className="page-subtitle">{data.hospitalName} &bull; Inpatient & Outpatient Clinical Triage</div>
+          <div className="page-subtitle">{cleanHospitalName(data.hospitalName)} &bull; Inpatient & Outpatient Clinical Triage</div>
         </div>
         <Link href="/emr" className="btn btn-primary btn-sm">
           <HeartPulse size={14} />
@@ -833,7 +834,7 @@ function ReceptionistDashboardView({ data }: { data: ReceptionistDashboardDto })
       <div className="page-header">
         <div>
           <h1 className="page-title">Front Desk & Reception</h1>
-          <div className="page-subtitle">{data.hospitalName} &bull; Patient Check-In & Scheduling Shortcuts</div>
+          <div className="page-subtitle">{cleanHospitalName(data.hospitalName)} &bull; Patient Check-In & Scheduling Shortcuts</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <Link href="/appointments" className="btn btn-primary btn-sm">
@@ -968,7 +969,7 @@ function LabTechnicianDashboardView({ data }: { data: LabTechnicianDashboardDto 
       <div className="page-header">
         <div>
           <h1 className="page-title">Diagnostic Laboratory Workspace</h1>
-          <div className="page-subtitle">{data.hospitalName} &bull; Specimen Processing & Pathology Pipeline</div>
+          <div className="page-subtitle">{cleanHospitalName(data.hospitalName)} &bull; Specimen Processing & Pathology Pipeline</div>
         </div>
         <Link href="/laboratory" className="btn btn-primary btn-sm">
           <FlaskConical size={14} />
@@ -1104,7 +1105,7 @@ function PharmacistDashboardView({ data }: { data: PharmacistDashboardDto }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">Pharmacy & Inventory Station</h1>
-          <div className="page-subtitle">{data.hospitalName} &bull; Prescription Dispensing & Formulary Stock Ledger</div>
+          <div className="page-subtitle">{cleanHospitalName(data.hospitalName)} &bull; Prescription Dispensing & Formulary Stock Ledger</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <Link href="/prescriptions" className="btn btn-primary btn-sm">
@@ -1256,7 +1257,7 @@ function AccountantDashboardView({ data }: { data: AccountantDashboardDto }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">Hospital Billing & Financial Reconciliations</h1>
-          <div className="page-subtitle">{data.hospitalName} &bull; Authoritative Revenue & Invoicing Metrics</div>
+          <div className="page-subtitle">{cleanHospitalName(data.hospitalName)} &bull; Authoritative Revenue & Invoicing Metrics</div>
         </div>
         <Link href="/billing" className="btn btn-primary btn-sm">
           <CreditCard size={14} />
@@ -1406,7 +1407,7 @@ function PatientDashboardView({ data }: { data: PatientDashboardDto }) {
         <div>
           <h1 className="page-title">Welcome, {data.patientName}!</h1>
           <div className="page-subtitle">
-            MRN: {data.mrn} &bull; {data.hospitalName} Patient Portal
+            MRN: {data.mrn} &bull; {cleanHospitalName(data.hospitalName)} Patient Portal
           </div>
         </div>
         <Link href="/portal" className="btn btn-primary btn-sm">

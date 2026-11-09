@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "../lib/auth-context";
+import { cleanHospitalName, cleanHospitalCode } from "../lib/branding";
 import {
   User,
   Building2,
@@ -53,23 +54,27 @@ export default function ProfilePage() {
     ((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")) ||
     (user?.email?.[0] || "U").toUpperCase();
 
-  const hospitalName =
+  const rawHospitalName =
     (user as any)?.hospital?.name ||
     (user?.hospitalId === "hosp-apex-001"
       ? "Apex Multispecialty Hospital"
       : user?.hospitalId === "hosp-demo-001"
-        ? "MedCore Demo Hospital"
+        ? "MedCore Hospital"
         : user?.hospitalId
           ? user.hospitalId
           : "Global Platform System");
 
-  const hospitalCode =
+  const hospitalName = cleanHospitalName(rawHospitalName);
+
+  const rawHospitalCode =
     (user as any)?.hospital?.code ||
     (user?.hospitalId === "hosp-demo-001"
-      ? "DEMO-MAIN"
+      ? "MC-MAIN"
       : user?.hospitalId === "hosp-apex-001"
         ? "APEX-MAIN"
         : user?.hospitalId || "PLATFORM-GLOBAL");
+
+  const hospitalCode = cleanHospitalCode(rawHospitalCode);
 
   return (
     <div className="page-container" style={{ maxWidth: 1000, margin: "0 auto", paddingBottom: 48 }}>
