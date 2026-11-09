@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@medcore/types"],
   output: process.env.DOCKER_STANDALONE === "true" ? "standalone" : undefined,
   poweredByHeader: false,
   experimental: {
